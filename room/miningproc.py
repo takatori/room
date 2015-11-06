@@ -4,7 +4,7 @@
 import zmq
 
 import zmq_base as base
-import collaborative_filtering as cf
+import mining.collaborative_filtering as cf
 import loader
 import converter
 import data
