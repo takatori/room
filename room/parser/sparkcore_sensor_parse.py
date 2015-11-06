@@ -5,9 +5,7 @@ import zmq
 from zmq.eventloop.ioloop import PeriodicCallback
 import time
 
-import zmq_base as base
-import state
-
+from room.utils import zmq_base as base
 
 class ParseProc(base.ZmqProcess):
 

@@ -3,9 +3,7 @@
 
 import pandas as pd
 import numpy as np
-
-import loader
-import converter
+from room.utils import converter
 
 class Data:
     '''
@@ -14,7 +12,7 @@ class Data:
     '''
 
     # コンストラクタ
-    def __init__(self, data, sensor_list, appliance_list):
+    def __init__(self, data=pd.DataFrame(), sensor_list=[], appliance_list=[]):
 
         assert isinstance(data, pd.core.frame.DataFrame), 'type error: ' + str(type(data)) + ' != pandas.core.frame.DataFrame'
         
@@ -74,14 +72,4 @@ class Data:
         assert isinstance(new, pd.core.frame.DataFrame), 'type error: ' + str(type(new)) + ' != pandas.core.frame.DataFrame'        
         self.__data.append(new)
 
-
-if __name__ == "__main__":
-    print('Loading log data...')        
-    sensorlog = loader.sensorlog()
-    appliance_statuslog = loader.appliance_statuslog()
-    df = converter.coordinate(sensorlog, appliance_statuslog)
-    s_df, a_df = converter.partition(df, len(sensorlog[0])-2)
-    test = Data(df, s_df.columns, a_df.columns)
-    print('Complete loading !')
-    print(type(test.set()))
         

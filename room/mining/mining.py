@@ -2,17 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import zmq
-
-import zmq_base as base
-import mining.collaborative_filtering as cf
-import loader
-import converter
+from room.utils import zmq_base as base
+from room.utils import converter
+import collaborative_filtering as cf
 import data
 
 host = '127.0.0.1'
 port = '5556'
 
-class MiningProc(base.ZmqProcess):
+class Mining(base.ZmqProcess):
 
     def __init__(self, bind_addr):
         super().__init__()
@@ -67,11 +65,7 @@ class MiningHandler(object):
 
         '''
         print('Loading log data...')        
-        sensorlog = loader.sensorlog()
-        appliance_statuslog = loader.appliance_statuslog()
-        df = converter.coordinate(sensorlog, appliance_statuslog)
-        s_df, a_df = converter.partition(df, len(sensorlog[0])-2)
-        self._data = data.Data(df, s_df.columns, a_df.columns)
+        self._data = data.Data()
         print('Complete loading !')
         
     def add(self, df):
@@ -107,6 +101,6 @@ class MiningHandler(object):
     
 
 if __name__ == "__main__":
-    proc = MiningProc('127.0.0.1:5556')
+    proc = Mining('127.0.0.1:5556')
     proc.run()
     
