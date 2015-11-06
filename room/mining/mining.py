@@ -4,7 +4,7 @@
 import zmq
 from room.utils import zmq_base as base
 from room.utils import converter
-import collaborative_filtering as cf
+from room.mining.estimator import collaborative_filtering as cf
 import data
 
 host = '127.0.0.1'
