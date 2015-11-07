@@ -46,7 +46,13 @@ class State:
         @return dict_keys
         '''        
         return self._applianece_state.keys()
-        
+
+    def get_sensor_value(self, key):
+        return self._sensor_state[key]
+
+    def get_appliance_value(self, key):
+        return self._applianece_state[key]
+    
     def to_json(self):
         '''
         sensor, applianceの状態をjsonにして返す
@@ -83,17 +89,3 @@ class State:
         now = datetime.now(tz)
         return self.to_json_with_timestamp(now)
     
-if __name__ == "__main__":
-
-    state = State()
-    state.update_sensor('temp', 22)
-    state.update_sensor('humid', 23)
-    state.update_sensor('pressure', 23)    
-    state.update_appliance('tv', 1)
-    state.update_appliance('tv', 0)
-    state.update_appliance('light', 1)    
-    print(type(state.get_sensor_keys()))
-    print(state.get_appliance_keys())
-    print(type(state.to_json()))
-    print(state.to_json_at_now())
-    print(str(state))
