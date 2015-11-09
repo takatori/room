@@ -4,9 +4,10 @@
 import zmq
 from zmq.eventloop.ioloop import PeriodicCallback
 import time
+from tornado.options import define, options
 
 from room.utils import zmq_base as base
-import state
+from room.buffer.state import State
 
 class BufferModule(base.ZmqProcess):
 
@@ -16,7 +17,7 @@ class BufferModule(base.ZmqProcess):
         self.bind_addr = bind_addr
         self.sub_stream = None
         self.timer = None
-        self.state = state.State()
+        self.state = State()
         self.buffer_handler = BufferHandler(self.state)
         self.publisher = Publisher(self.state)
         
