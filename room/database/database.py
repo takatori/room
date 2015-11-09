@@ -16,13 +16,13 @@ class DatabaseModule(base.ZmqProcess):
         self.sub_stream = None
         self.db = database
     
-    def setup():
+    def setup(self, keyword):
         super().setup()
-        self.sub_stream, _ = self.steam(zmq.SUB, self.bind_addr, bind=False, subscribe=keyword.encode('utf-8'))
-        self.stream.on_recv(SubStreamHandler(self.sub_stream, self.stop))
+        self.sub_stream, _ = self.stream(zmq.SUB, self.bind_addr, bind=False, subscribe=keyword.encode('utf-8'))
+        self.sub_stream.on_recv(SubStreamHandler(self.sub_stream, self.stop, self.db))
 
     def run(self):
-        self.stop()
+        self.setup()
         print('Start loop!')
         self.loop.start()
 
