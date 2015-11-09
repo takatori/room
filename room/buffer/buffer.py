@@ -8,7 +8,7 @@ import time
 from room.utils import zmq_base as base
 import state
 
-class Buffer(base.ZmqProcess):
+class BufferModule(base.ZmqProcess):
 
     def __init__(self, bind_addr):
         super().__init__()
@@ -89,7 +89,7 @@ class Publisher(object):
 
         
 if __name__ == "__main__":
-    proc = Buffer('127.0.0.1:5557')
+    proc = BufferModule('127.0.0.1:5557')
     proc.run()
 
     
