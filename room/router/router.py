@@ -13,26 +13,11 @@ from tornado import gen
 from tornado.options import define, options, parse_command_line
 from zmq.utils import jsonapi as json
 
+from room.utils.publisher import Publisher
+
 define("port", default=8888, help="run on the given port", type=int)
+define("output_addr", default="127.0.0.1:5558")
 define("debug", default=False, help="run in debug mode")
-
-class Publisher(object):
-
-    def __init__(self):
-        context = zmq.Context()
-        self._sock = context.socket(zmq.PUB)
-        self._sock.bind("tcp://*:5558")
-
-        print("Starting broadcast")
-        print("Hit Ctrl-C to stop broadcasting.")
-        print("Waiting so subscriber sockets can connect...")
-        time.sleep(1.0) # slow join問題
-
-    def send(self, data_type, data):
-        msg = json.dumps(['parse', data['data']])
-        self._sock.send_multipart([data_type.encode('utf-8'), msg])
-
-publisher = Publisher()
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
@@ -45,25 +30,38 @@ class DataHandler(tornado.web.RequestHandler):
     format `` { "data-type": "sparkcore", "data": {...} } ``
 
     '''
+    def __init__(self):
+        publisher = Publisher(options.output_addr)
+    
     def post(self):
         data = json.loads(self.request.body.decode('utf-8')) # jsonデータが投げられると断定
         data_type = data.pop('data-type')  # parserの種類
-        publisher.send(data_type, data) # parserを指定してデータを送信
+        publisher.send(data_type, 'parse', data)
         self.write(data)
 
-def main():
-    app = tornado.web.Application(
-        [
-            (r"/", MainHandler),
-            (r"/data", DataHandler),
-        ],
-        debug=options.debug,
-    )
-    app.listen(options.port)
-    print("Start app!")
-    tornado.ioloop.IOLoop.current().start()    
+class Application(object):
 
+    def __init__(self):
+        self._loop = tornado.ioloop.IOLoop.current()
+        app = tornado.web.Application(
+            [
+                (r"/", MainHandler),
+                (r"/data", DataHandler),
+            ],
+            debug=options.debug,
+        )
+        app.listen(options.port)
+
+    def start(self):
+        print("Start app!")
+        self._loop.start()
+        
+    def stop(self):
+        print("Stop app!")    
+        self._loop.stop()
+        
 if __name__ == "__main__":
-    main()
+    app = Application()
+    app.start()
 
 
