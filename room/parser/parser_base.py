@@ -6,8 +6,12 @@ import zmq
 from zmq.eventloop.ioloop import PeriodicCallback
 from abc import ABCMeta
 from abc import abstractmethod
+from tornado.options import define, options
 
 from room.utils import zmq_base as base
+from room.utils.publisher import Publisher
+
+define("out_addr", default="*:5557")
 
 class ParserModule(base.ZmqProcess):
 
@@ -37,12 +41,12 @@ class SubStreamHandler(base.MessageHandler):
         self._sub_stream = sub_stream
         self._stop = stop
         self._parser = parser
-        self._publisher = Publisher()
+        self._publisher = Publisher(options.out_addr)
 
     def parse(self, *data):
         parsed_data = self._parser.parse(data)
         for category, state in parsed_data:
-            self._publisher.send(category, state)
+            self._publisher.send('', category, state)
         
     def stop(self, data):
         self._stop()
@@ -59,20 +63,3 @@ class Parser(metaclass=ABCMeta):
         '''
         raise NotImplementedError()
 
-    
-class Publisher(object):
-
-    def __init__(self):
-        context = zmq.Context()
-        self._sock = context.socket(zmq.PUB)
-        self._sock.bind("tcp://*:5557")
-
-        print("Starting broadcast")
-        print("Hit Ctrl-C to stop broadcasting.")
-        print("Waiting so subscriber sockets can connect...")
-        time.sleep(1.0) # SUB は定期的に PUB に接続を見に行くので、少し待つ必要が有る
-
-    def send(self, method, data):
-        msg = [method, data]
-        self._sock.send_json(data)
-    

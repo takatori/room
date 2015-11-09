@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import parser_base
+from tornado.options import define, options
+
+define("input_addr", default="127.0.0.1:5558")
 
 class ApplianceParserModule(parser_base.ParserModule):
 
@@ -25,6 +28,6 @@ class ApplianceParser(parser_base.Parser):
 
 
 if __name__ == "__main__":
-    proc = ApplianceParserModule('127.0.0.1:5558')
+    proc = ApplianceParserModule(options.input_addr)
     proc.run()
         
