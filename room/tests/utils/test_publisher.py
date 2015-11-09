@@ -4,29 +4,17 @@
 import unittest
 import zmq
 import time
-from room.utils.publisher import Publisher
 from zmq.utils import jsonapi as json
 
-class Subscriber():
-
-    def __init__(self):
-        self.context = zmq.Context()
-        self.socket = self.context.socket(zmq.SUB)
-        self.socket.connect('tcp://127.0.0.1:5556')
-        self.socket.setsockopt(zmq.SUBSCRIBE, b'')
-        time.sleep(1.0)
-        
-    def recv(self):
-        return self.socket.recv_multipart()
-     
-        
+from room.utils.publisher import Publisher
+from room.tests.utils.subscriber import Subscriber
 
 class PublisherTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.publisher = Publisher('127.0.0.1:5556')
-        cls.subscriber = Subscriber()
+        cls.subscriber = Subscriber('127.0.0.1:5556', b'test')        
         
     def test_send(self):
         self.publisher.send('test', 'method', '{"temp": 20, "humid": 30}')
