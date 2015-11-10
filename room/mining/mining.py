@@ -2,15 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import zmq
+from tornado.options import define, options
+
 from room.utils import zmq_base as base
 from room.utils import converter
 from room.mining.estimator import collaborative_filtering as cf
-import data
+from room.mining.data import Data
+from room.utils.publisher import Publisher
 
-host = '127.0.0.1'
-port = '5556'
+define("in_addr", default="127.0.0.1:5556")
+define("out_addr", default="127.0.0.1:5555")
 
-class Mining(base.ZmqProcess):
+class MiningModule(base.ZmqProcess):
 
     def __init__(self, bind_addr):
         super().__init__()
@@ -41,14 +44,16 @@ class SubStreamHandler(base.MessageHandler):
         self._sub_stream = sub_stream
         self._stop = stop
         self._mining_handler = mining_handler
-
+        self._publisher = Publisher(options.out_addr)
 
     def mining(self, data):
         df = converter.dict_to_df(data)
         self._mining_handler.add(df)
         index = len(data['sensors'].keys())
         sensor_df, appliance_df = converter.partition(df,index) # dataframeを分割
-        print(self._mining_handler.predict(sensor_df.values[0]))
+        result = self._mining_handler.predict(sensor_df.values[0])
+        self._publisher('', 'output', result)
+
         
     def stop(self, data):
         self._stop()
@@ -65,7 +70,7 @@ class MiningHandler(object):
 
         '''
         print('Loading log data...')        
-        self._data = data.Data()
+        self._data = Data()
         print('Complete loading !')
         
     def add(self, df):
@@ -98,9 +103,10 @@ class MiningHandler(object):
             current_sensor,
             appliance_status
         )
-    
 
+
+    
 if __name__ == "__main__":
-    proc = Mining('127.0.0.1:5556')
+    proc = MiningModule('127.0.0.1:5556')
     proc.run()
     
