@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import zmq
 from abc import ABCMeta, abstractmethod
 
 from room.utils import zmq_base as base
