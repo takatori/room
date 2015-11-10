@@ -12,13 +12,6 @@ class MongoModule(database.DatabaseModule):
     def setup(self):
         super().setup('mongo')
 
-    def run(self):
-        super().run()
-
-    def stop(self):
-        super().stop()
-
-
 class MongoDB(database.Database):
 
     def __init__(self):

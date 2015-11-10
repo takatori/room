@@ -17,12 +17,6 @@ class SparkCoreParserModule(parser_base.ParserModule):
     def setup(self):
         super().setup('sparkcore')
 
-    def run(self):
-        super().run()
-
-    def stop(self):
-        super().stop()
-
 class SparkCoreParser(parser_base.Parser):
         
     def parse(self, data):

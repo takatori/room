@@ -14,13 +14,6 @@ class ApplianceParserModule(parser_base.ParserModule):
     def setup(self):
         super().setup('appliance')
 
-    def run(self):
-        super().run()
-
-    def stop(self):
-        super().stop()
-
-
 class ApplianceParser(parser_base.Parser):
         
     def parse(self, data):
