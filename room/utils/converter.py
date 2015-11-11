@@ -266,7 +266,7 @@ def dict_to_df(data):
     '''
     
     '''
-    timestamp = data['time']
+    timestamp = data['timestamp']
 
     sensor_dict = data['sensors']
     sensor_list = list(sensor_dict.keys())
