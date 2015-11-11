@@ -1,15 +1,13 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from tornado.options import define, options
 from room.buffer.buffer import BufferModule, StateHandler
-
-define('buffer_in_addr', default="127.0.0.1:5557")
+from room.utils.config import config
 
 class DefaultBufferModule(BufferModule):
 
-    def __init__(self, bind_addr):
-        super().__init__(bind_addr, DefaultStateHandler())
+    def __init__(self, port):
+        super().__init__('localhost:{0}'.format(port), DefaultStateHandler())
     
     def setup(self):
         super().setup(keyword='', period=1000)
@@ -34,5 +32,5 @@ class DefaultStateHandler(StateHandler):
         return self._state._applianece_state
         
 if __name__ == "__main__":
-    proc = DefaultBufferModule(options.buffer_in_addr)
+    proc = DefaultBufferModule(config['parser_buffer_forwarder']['back_port'])
     proc.run()

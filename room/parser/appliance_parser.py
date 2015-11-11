@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import parser_base
-from tornado.options import define, options
 
-define("input_addr", default="127.0.0.1:5558")
+from room.utils.config import config
 
 class ApplianceParserModule(parser_base.ParserModule):
 
-    def __init__(self, bind_addr):
-        super().__init__(bind_addr, ApplianceParser())
+    def __init__(self, port):
+        super().__init__('localhost:{0}'.format(port), ApplianceParser())
 
     def setup(self):
         super().setup('appliance')
@@ -17,10 +16,11 @@ class ApplianceParserModule(parser_base.ParserModule):
 class ApplianceParser(parser_base.Parser):
         
     def parse(self, data):
-        return [('appliance', '{"light": 0}'), ('appliance', '{"viera": 1}')]
+        data = data[1]
+        return [('appliance', {key: data[key]}) for key in data.keys()]
 
 
 if __name__ == "__main__":
-    proc = ApplianceParserModule(options.input_addr)
+    proc = ApplianceParserModule(config['router_parser_forwarder']['back_port'])
     proc.run()
         
