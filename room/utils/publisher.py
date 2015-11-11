@@ -4,13 +4,15 @@
 import zmq
 import time
 from zmq.utils import jsonapi as json
+from room.utils import log
 
 class Publisher(object):
 
-    def __init__(self, bind_addr):
+    def __init__(self, port):
         context = zmq.Context()
         self._sock = context.socket(zmq.PUB)
-        self._sock.bind("tcp://" + bind_addr)
+        log.logging.info(port)
+        self._sock.connect("tcp://%s:%s" % ("localhost", port))
 
         print("Starting broadcast")
         print("Hit Ctrl-C to stop broadcasting.")
@@ -22,3 +24,5 @@ class Publisher(object):
         data = [data_type.encode('utf-8'), msg]
         self._sock.send_multipart([data_type.encode('utf-8'), msg])
 
+    def stop(self):
+        self._sock.close()
