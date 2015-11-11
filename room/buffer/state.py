@@ -16,6 +16,14 @@ class State:
         
     def __str__(self):
         return str(self.to_json_at_now())
+
+    def format_sensors(self, keys, value):
+        for key in keys:
+            self._sensor_state[key] = value
+
+    def format_appliances(self, keys,value):
+        for key in keys:
+            self._applianece_state[key] = value
         
     def update_sensor(self, key, value):
         '''
