@@ -6,12 +6,12 @@ import zmq
 from zmq.eventloop.ioloop import PeriodicCallback
 from abc import ABCMeta
 from abc import abstractmethod
-from tornado.options import define, options
 
 from room.utils import zmq_base as base
 from room.utils.publisher import Publisher
+from room.utils.log import logging
+from room.utils.config import config
 
-define("out_addr", default="*:5557")
 
 class ParserModule(base.ZmqProcess):
 
@@ -41,9 +41,10 @@ class SubStreamHandler(base.MessageHandler):
         self._sub_stream = sub_stream
         self._stop = stop
         self._parser = parser
-        self._publisher = Publisher(options.out_addr)
+        self._publisher = Publisher(config['parser_buffer_forwarder']['front_port'])
 
     def parse(self, *data):
+        logging.info(data)
         parsed_data = self._parser.parse(data)
         for category, state in parsed_data:
             self._publisher.send('', category, state)

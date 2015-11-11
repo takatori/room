@@ -4,14 +4,13 @@
 import zmq
 import time
 from zmq.eventloop.ioloop import PeriodicCallback
-from tornado.options import define, options
 from abc import ABCMeta,abstractmethod
 
+from room.buffer.state import State
 from room.utils import zmq_base as base
 from room.utils.publisher import Publisher
-from room.buffer.state import State
-
-define('buffer_out_addr', default="*:5556")
+from room.utils.config import config
+from room.utils.log import logging
 
 class BufferModule(base.ZmqProcess):
 
@@ -46,13 +45,15 @@ class SubStreamHandler(base.MessageHandler):
         self._stop = stop
         self._state_handler = state_handler
 
-    def sensor(self, data):
+    def sensor(self, *data):
+        logging.info('sensor {0}'.format(data))
         self._state_handler.update_sensor(data)
 
-    def appliance(self, data):
+    def appliance(self, *data):
+        logging.info('appliance {0}'.format(data))        
         self._state_handler.update_appliance(data)
 
-    def stop(self, data):
+    def stop(self, *data):
         self._stop()
 
 
@@ -61,7 +62,7 @@ class StateHandler(metaclass=ABCMeta):
 
     def __init__(self):
         self._state = State()
-        self._publisher = Publisher(options.buffer_out_addr)
+        self._publisher = Publisher(config['buffer_core_forwarder']['front_port'])
 
     @abstractmethod
     def __call__(self):

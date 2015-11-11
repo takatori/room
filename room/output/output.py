@@ -5,6 +5,7 @@ import zmq
 from abc import ABCMeta, abstractmethod
 
 from room.utils import zmq_base as base
+from room.utils.log import logging
 
 class OutputModule(base.ZmqProcess):
 
@@ -35,7 +36,8 @@ class SubStreamHandler(base.MessageHandler):
         self._stop = stop
         self._action = action
 
-    def action(self, *data):
+    def output(self, *data):
+        logging.info(data)
         self._action.action(data)
 
     def stop(self, data):
