@@ -15,5 +15,9 @@ class Subscriber():
         
     def recv(self):
         return self.socket.recv_multipart()
+
+    def stop(self):
+        self.socket.close()
+        self.context.term()
      
 
