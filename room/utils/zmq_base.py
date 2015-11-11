@@ -109,7 +109,7 @@ class  MessageHandler(object):
         
         # Try to JSON-decode the index "self._json_load" of the message
         i = self._json_load
-        msg_type, data = json.loads(msg[i])
+        msg_type, data = json.loads(msg[i]) # msg配列の一番最後が[msg_type, data]
         msg[i] = data
 
         # Get the actual message handler and call it
@@ -117,6 +117,12 @@ class  MessageHandler(object):
             raise AttributeError('%s starts with an "_"' % msg_type)
 
         getattr(self, msg_type)(*msg) # self.msg_typeと等価
+
+
+
+
+
+
 
 
 
