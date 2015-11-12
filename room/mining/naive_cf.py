@@ -3,7 +3,7 @@
 
 from room.mining.mining import MiningModule, MiningHandler
 from room.utils import converter
-from room.mining.data import Data
+from room.mining.naive_cf_data import NaiveCFData
 from room.mining.estimator import collaborative_filtering as cf
 from room.utils.config import config
 
@@ -13,39 +13,27 @@ class NaiveCollaborativeFilteringModule(MiningModule):
         super().__init__('localhost:{0}'.format(port), NaiveCollaborativeFiltering())
 
     def setup(self):
-        super().setup('')
+        super().setup()
 
 class NaiveCollaborativeFiltering(MiningHandler):
 
     def __init__(self):
-        self._data = None
+        self._data = NaiveCFData()
         self.load()
 
     def mining(self, data):
-        df = converter.dict_to_df(data)
-        self.add(df)
+        df = self._data.add(data) # dataに追加
         index = len(data['sensors'].keys())
-        sensor_df, appliance_df = converter.partition(df,index) # dataframeを分割
-        return self.predict(sensor_df.values[0])
+        sensor_df, appliance_df = self._data.split(df) # dataframeを分割
+        return self.recommend(sensor_df.values[0], appliance_df.values[0])
         
     def load(self):
         '''
         DBからログデータを取得し、self._dataにセットする
 
         '''
-        print('Loading log data...')        
-        self._data = Data()
+        print('Loading log data...')
         print('Complete loading !')
-        
-    def add(self, df):
-        '''
-        self._dataにデータを追加する
-
-        '''
-        self._data.add(df)
-
-    def show(self):
-        self._data.all()
         
     def predict(self, current_sensor):
         '''
@@ -64,7 +52,7 @@ class NaiveCollaborativeFiltering(MiningHandler):
 
         @return 
         '''
-        return cf.reccomend(
+        return cf.recommend(
             self._data.sensors(),
             self._data.appliances(),
             current_sensor,
@@ -72,7 +60,7 @@ class NaiveCollaborativeFiltering(MiningHandler):
         )
     
 if __name__ == "__main__":
-    proc = NaiveCollaborativeFilteringModule('localhost:{0}'.format(config['buffer_core_forwarder']['back_port']))
+    proc = NaiveCollaborativeFilteringModule(config['buffer_core_forwarder']['back_port'])
     proc.run()
     
     
