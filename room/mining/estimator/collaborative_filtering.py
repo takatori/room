@@ -75,7 +75,7 @@ def top_matches(records,current,n=100,similarity=sim_cos):
     return scores_series.order(ascending=False).ix[0:n]
 
 
-def predict_appliance_status(sensors, appliances, current):
+def predict_appliance_status(sensors, appliances, current, normalize_flag=False):
     '''
     現在のセンサログ値に近いログ100件から現在の家電の状態を予測したスコアを計算する
     1.現在のセンサログの値に近い過去のセンサログの類似度スコア100件を取得
@@ -90,16 +90,18 @@ def predict_appliance_status(sensors, appliances, current):
         current_sensor = np.array(current).astype(float)
 
     # 現在のセンサデータに最も近い過去のセンサデータ上位100件の類似度スコアを取得
-    sensor_scores = top_matches(normalize(sensors), current)
-
+    sensor_scores = top_matches(normalize(sensors) if normalize_flag else sensors, current)
+    
     # タイムスタンプだけ切り出し
     timestamp = sensor_scores.index
 
     appliance_score = np.zeros(len(appliances.axes[1])) # 家電の数の長さの配列を用意し0でうめる
 
-    # 家電状態とその時点のセンサ値の類似度スコアをかけたものを100件合計    
+    # 家電状態とその時点のセンサ値の類似度スコアをかけたものを100件合計
+    
     for t in timestamp:
-        appliance_score += np.array([sensor_scores.ix[t] * x for x in appliances.ix[t]]) 
+        appliance_score += np.array([sensor_scores.ix[t] * x for x in appliances.ix[t]])
+        
         
     # スコアの合計を計算
     sum_score = sensor_scores.sum()
