@@ -38,6 +38,7 @@ class SubStreamHandler(base.MessageHandler):
         self._db = db
         
     def mining(self, *data):
+        data = data[1]
         db.save(data)
         
     def stop(self, data):

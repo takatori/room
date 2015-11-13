@@ -3,21 +3,22 @@
 
 from pymongo import MongoClient
 from room.database import database
+from room.utils.config import config
 
 class MongoModule(database.DatabaseModule):
 
-    def __init__(self, bind_addr):
-        super().__init__(bind_addr, MongoDB())
+    def __init__(self, port):
+        super().__init__('localhost:{0}'.format(port), MongoDB())
 
     def setup(self):
-        super().setup('mongo')
+        super().setup(config['mongo']['keyword'])
 
 class MongoDB(database.Database):
 
     def __init__(self):
-        self._client = MongoClient('localhost', 27017)
-        self._db = self._client['room']
-        self._collection = self._db.test
+        self._client = MongoClient(config['mongo']['host'], int(config['mongo']['port']))
+        self._db = self._client[config['mongo']['db']]
+        self._collection = self._db.config['mongo']['collection']
         
     def save(self, data):
         self._collection.insert_one(data)
@@ -29,6 +30,6 @@ class MongoDB(database.Database):
         self._collection.delete_many({})
 
 if __name__ == "__main__":
-    proc = MongoModule('127.0.0.1:5556')
+    proc = MongoModule(config['buffer_core_forwarder']['back_port'])
     proc.run()
             
