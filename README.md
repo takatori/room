@@ -5,12 +5,13 @@ Room
 
 
 ## Architecture
-
+![architecture](img/room-architecture.jpeg)
 
 ## Data format
 - postデータ
   - data-type: parserの選択
   - data: データ本体
+
 ```json
 {
     "data-type": "sensor",
