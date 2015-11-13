@@ -3,7 +3,6 @@ Room
 リアルタイムマイニングシステム
 宅内に配置されたセンサや家電の状態をリアルタイムに解析して家電操作のレコメンドを行う
 
-
 ## Architecture
 ![architecture](img/room-architecture.jpeg)
 
@@ -37,6 +36,7 @@ Room
 
 ## Usage
 - 実行
+
 ```bash
 ./run.sh
 ```
