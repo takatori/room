@@ -10,7 +10,8 @@ class DefaultBufferModule(BufferModule):
         super().__init__('localhost:{0}'.format(port), DefaultStateHandler())
     
     def setup(self):
-        super().setup(keyword='', period=1000)
+        super().setup(keyword=config['default_buffer']['keyword'],
+                      period=int(config['default_buffer']['interval']))
         
 class DefaultStateHandler(StateHandler):
         
