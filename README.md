@@ -4,13 +4,13 @@ Room
 宅内に配置されたセンサや家電の状態をリアルタイムに解析して家電操作のレコメンドを行う
 
 - Contents
-  - [Features](#Features)
-  - [Architecture](#Architecture)
-  - [Modules](#Modules)
-  - [Requirement](#Requirement)
-  - [Install](#Install)
-  - [Setting](#Setings)
-  - [Usage](#Usage)
+  - [Features](#features)
+  - [Architecture](#architecture)
+  - [Modules](#modules)
+  - [Requirement](#requirement)
+  - [Install](#install)
+  - [Setting](#setings)
+  - [Usage](#usage)
 
   
 ## Features
