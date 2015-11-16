@@ -3,7 +3,17 @@ Room
 リアルタイムマイニングシステム
 宅内に配置されたセンサや家電の状態をリアルタイムに解析して家電操作のレコメンドを行う
 
-## Feature
+- Contents
+  - [Features](#Features)
+  - [Architecture](#Architecture)
+  - [Modules](#Modules)
+  - [Requirement](#Requirement)
+  - [Install](#Install)
+  - [Setting](#Setings)
+  - [Usage](#Usage)
+
+  
+## Features
 - リアルタイムストリーム処理
 - モジュールを細かく分割することにより様々なデータフォーマット・マイニングアルゴリズムを柔軟に追加できる
 - pub/subアーキテクチャにより自由にモジュールを構成できる
@@ -14,7 +24,7 @@ Room
 ## Architecture
 ![architecture](img/room-architecture.jpeg)
 
-## Module
+## Modules
 ### router
 - httpサーバ
 - ルーティングを行う
