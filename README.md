@@ -43,7 +43,7 @@ Room
 
 - postデータ
   - data-type: parserの選択、unique制約(他のデータソースと名前がかぶらないようにする必要がある)
-  - data: データ本体、以下のフォーマットの**jsonデータ**
+  - data: データ本体、**jsonデータ**
 
 
 ### parser
