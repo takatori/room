@@ -7,7 +7,7 @@ import json
 
 from room.mining.naive_cf import NaiveCollaborativeFiltering
 
-
+@unittest.skip("TODO")
 class NaiveCollaborativeFilteringTest(unittest.TestCase):
 
     @classmethod

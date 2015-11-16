@@ -7,7 +7,7 @@ from zmq.utils import jsonapi as json
 from room.buffer.default_buffer import DefaultBufferModule, DefaultStateHandler
 from room.tests.utils.subscriber import Subscriber
 
-
+@unittest.skip("TODO")
 class DefaultStateHandlerTest(unittest.TestCase):
 
     @classmethod

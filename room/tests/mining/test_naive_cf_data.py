@@ -7,7 +7,7 @@ import json
 
 from room.mining.naive_cf_data import NaiveCFData
 
-
+@unittest.skip("TODO")
 class NaiveCFDataTest(unittest.TestCase):
 
     @classmethod
