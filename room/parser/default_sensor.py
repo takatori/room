@@ -19,7 +19,6 @@ class DefaultSensorParserModule(parser_base.ParserModule):
 class DefaultSensorParser(parser_base.Parser):
 
     def parse(self, data):
-        data = data[1]
         return [('sensor', {key: data[key]}) for key in data.keys()]
 
 if __name__ == "__main__":
