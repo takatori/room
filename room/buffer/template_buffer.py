@@ -69,12 +69,10 @@ class TemlateStateHandler(StateHandler):
         self._publisher.send('', 'mining', self._state.to_json_at_now())        
     
     def update_sensor(self, data):
-        data = data[1]
         key,value = list(data.items())[0]
         self._state.update_sensor(key, value)
 
     def update_appliance(self, data):
-        data = data[1]
         key,value = list(data.items())[0]        
         self._state.update_appliance(key, value)
 

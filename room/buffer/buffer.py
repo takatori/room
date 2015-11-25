@@ -3,6 +3,7 @@
 
 import zmq
 import time
+import json
 from zmq.eventloop.ioloop import PeriodicCallback
 from abc import ABCMeta,abstractmethod
 
@@ -47,11 +48,11 @@ class SubStreamHandler(base.MessageHandler):
 
     def sensor(self, *data):
         logging.info('sensor {0}'.format(data))
-        self._state_handler.update_sensor(data)
+        self._state_handler.update_sensor(json.laods(data[1]))
 
     def appliance(self, *data):
         logging.info('appliance {0}'.format(data))        
-        self._state_handler.update_appliance(data)
+        self._state_handler.update_appliance(json.laods(data[1]))
 
     def stop(self, *data):
         self._stop()
