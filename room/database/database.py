@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import json
 import zmq
 from abc import ABCMeta
 from abc import abstractmethod
@@ -38,8 +39,8 @@ class SubStreamHandler(base.MessageHandler):
         self._db = db
         
     def mining(self, *data):
-        data = data[1]
-        db.save(data)
+        data = json.loads(data[1])
+        self._db.save(data)
         
     def stop(self, data):
         self._stop()
