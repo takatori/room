@@ -46,7 +46,7 @@ class SubStreamHandler(base.MessageHandler):
 
     def parse(self, *data):
         logging.info(data)
-        parsed_data = self._parser.parse(json.loads(data))
+        parsed_data = self._parser.parse(json.loads(data[1]))
         for category, state in parsed_data:
             self._publisher.send('', category, state)
         
