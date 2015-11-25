@@ -18,7 +18,7 @@ class MongoDB(database.Database):
     def __init__(self):
         self._client = MongoClient(config['mongo']['host'], int(config['mongo']['port']))
         self._db = self._client[config['mongo']['db']]
-        self._collection = self._db.config['mongo']['collection']
+        self._collection = self._db[config['mongo']['collection']]
         
     def save(self, data):
         self._collection.insert_one(data)
