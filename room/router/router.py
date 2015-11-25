@@ -32,7 +32,7 @@ class DataHandler(tornado.web.RequestHandler):
     def post(self):
         data = json.loads(self.request.body.decode('utf-8')) # jsonデータが投げられると断定
         log.logging.info(data)
-        data_type = data.pop('data-type')  # parserの種類
+        data_type = data.pop('data_type')  # parserの種類
         publisher.send(data_type, 'parse', data['data'])
         self.write(data)
     

@@ -34,7 +34,7 @@ Room
 
 ```json
 {
-    "data-type": "sensor",
+    "data_type": "sensor",
     "data": {
         temperature: ...
     }
@@ -42,7 +42,7 @@ Room
 ```
 
 - postデータ
-  - data-type: parserの選択、unique制約(他のデータソースと名前がかぶらないようにする必要がある)
+  - data_type: parserの選択、unique制約(他のデータソースと名前がかぶらないようにする必要がある)
   - data: データ本体、**jsonデータ**
 
 
