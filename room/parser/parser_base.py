@@ -3,6 +3,7 @@
 
 import time
 import zmq
+import json
 from zmq.eventloop.ioloop import PeriodicCallback
 from abc import ABCMeta
 from abc import abstractmethod
@@ -45,7 +46,7 @@ class SubStreamHandler(base.MessageHandler):
 
     def parse(self, *data):
         logging.info(data)
-        parsed_data = self._parser.parse(data)
+        parsed_data = self._parser.parse(json.loads(data))
         for category, state in parsed_data:
             self._publisher.send('', category, state)
         
