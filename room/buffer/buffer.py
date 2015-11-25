@@ -52,7 +52,7 @@ class SubStreamHandler(base.MessageHandler):
 
     def appliance(self, *data):
         logging.info('appliance {0}'.format(data))        
-        self._state_handler.update_appliance(json.laods(data[1]))
+        self._state_handler.update_appliance(json.loads(data[1]))
 
     def stop(self, *data):
         self._stop()
