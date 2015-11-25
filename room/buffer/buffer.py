@@ -48,7 +48,7 @@ class SubStreamHandler(base.MessageHandler):
 
     def sensor(self, *data):
         logging.info('sensor {0}'.format(data))
-        self._state_handler.update_sensor(json.laods(data[1]))
+        self._state_handler.update_sensor(json.loads(data[1]))
 
     def appliance(self, *data):
         logging.info('appliance {0}'.format(data))        
