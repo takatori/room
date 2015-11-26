@@ -11,14 +11,14 @@ class ApplianceParserModule(parser_base.ParserModule):
         super().__init__('localhost:{0}'.format(port), ApplianceParser())
 
     def setup(self):
-        super().setup('appliance')
+        super().setup('appliance_status')
 
 class ApplianceParser(parser_base.Parser):
         
     def parse(self, data):
         return [('appliance', {key: data[key]}) for key in data.keys()]
 
-
+    
 if __name__ == "__main__":
     proc = ApplianceParserModule(config['router_parser_forwarder']['back_port'])
     proc.run()
