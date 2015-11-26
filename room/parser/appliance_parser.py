@@ -16,6 +16,7 @@ class ApplianceParserModule(parser_base.ParserModule):
 class ApplianceParser(parser_base.Parser):
         
     def parse(self, data):
+        data.pop('time')
         return [('appliance', {key: data[key]}) for key in data.keys()]
 
     
