@@ -74,5 +74,5 @@ class TestStateHandler(StateHandler):
         return self._state._applianece_state
         
 if __name__ == "__main__":
-    proc = TemplateBufferModule(config['parser_buffer_forwarder']['back_port'])
+    proc = TestBufferModule(config['parser_buffer_forwarder']['back_port'])
     proc.run()
