@@ -17,8 +17,9 @@ class InOutParserModule(parser_base.ParserModule):
 class InOutParser(parser_base.Parser):
         
     def parse(self, data):
-        data.pop('time')
-        return [('sensor', json.dumps({key: data[key]})) for key in data.keys()]
+        user = data['user']
+        state = 1 if data['state'] == 'in' else 0
+        return [('sensor', json.dumps({user: state}))]
 
     
 if __name__ == "__main__":
