@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import parser_base
+import json
 
 from room.utils.config import config
 
@@ -17,18 +18,11 @@ class InOutParser(parser_base.Parser):
         
     def parse(self, data):
         data.pop('time')
-        return [('sensor', {key: data[key]}) for key in data.keys()]
+        return [('sensor', json.dumps({key: data[key]})) for key in data.keys()]
 
     
 if __name__ == "__main__":
     proc = InOutParserModule(config['router_parser_forwarder']['back_port'])
     proc.run()
-
-
-
-
-
-
-
 
 
