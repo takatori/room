@@ -17,6 +17,7 @@ class SparkCoreParserModule(parser_base.ParserModule):
 class SparkCoreParser(parser_base.Parser):
         
     def parse(self, data):
+        data.pop('time')
         coreId = data.pop('sensorId')
         return [('sensor', json.dumps({coreId + "_" + key: data[key]}))
             for key in data.keys()]
