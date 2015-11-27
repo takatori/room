@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import multiprocessing
-
-from zmq.eventloop import ioloop, zmqstream
 import zmq
-
+import multiprocessing
+from zmq.eventloop import ioloop, zmqstream
 from zmq.utils import jsonapi as json
 
 class ZmqProcess(multiprocessing.Process):
