@@ -1,28 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import json
-
-from room.parser import parser_base
+from room import parser
 from room.utils.config import config
 
-class SparkCoreParserModule(parser_base.ParserModule):
+class SparkCoreParserModule(parser.ParserModule):
 
-    def __init__(self, port):
-        super().__init__('localhost:{0}'.format(port), SparkCoreParser())
+    def __init__(self):
+        super().__init__(
+            recv_addr='localhost:{0}'.format(config['router_parser_forwarder']['back_port']),
+            send_addr=int(config['parser_buffer_forwarder']['front_port']),
+            recv_title='sparkcore',
+            send_title='',
+            category='sensor',
+            parser=SparkCoreParser()
+        )
 
-    def setup(self):
-        super().setup('sparkcore')
-
-class SparkCoreParser(parser_base.Parser):
+class SparkCoreParser(parser.Parser):
         
     def parse(self, data):
         data.pop('time')
         coreId = data.pop('sensorId')
-        return [('sensor', json.dumps({coreId + "_" + key: data[key]}))
-            for key in data.keys()]
+        return [{coreId + "_" + key: data[key]} for key in data.keys()]
 
 if __name__ == "__main__":
-    proc = SparkCoreParserModule(config['router_parser_forwarder']['back_port'])
-    proc.run()
+    process = SparkCoreParserModule()
+    process.run()
         

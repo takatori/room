@@ -4,20 +4,20 @@
 import zmq
 from abc import ABCMeta, abstractmethod
 
-from room.utils import zmq_base as base
-from room.utils.log import logging
+from room import zmq_base as base
 
 class OutputModule(base.ZmqProcess):
 
-    def __init__(self, bind_addr, action):
+    def __init__(self, recv_addr, recv_title, action):
         super().__init__()
-        self.bind_addr = bind_addr
-        self.sub_stream = None
-        self.action = action
+        self.sub_stream = None        
+        self.recv_addr  = recv_addr
+        self.recv_title = recv_title
+        self.action     = action
 
-    def setup(self, keyword):
+    def setup(self):
         super().setup()
-        self.sub_stream, _ = self.stream(zmq.SUB, self.bind_addr, bind=False, subscribe=keyword.encode('utf-8'))
+        self.sub_stream, _ = self.stream(zmq.SUB, self.recv_addr, bind=False, subscribe=self.recv_title.encode('utf-8'))
         self.sub_stream.on_recv(SubStreamHandler(self.sub_stream, self.stop, self.action))
 
     def run(self):
@@ -36,8 +36,7 @@ class SubStreamHandler(base.MessageHandler):
         self._stop = stop
         self._action = action
 
-    def output(self, *data):
-        logging.info(data)
+    def execute(self, data):
         self._action.action(data)
 
     def stop(self, data):

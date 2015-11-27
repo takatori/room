@@ -6,6 +6,8 @@ import multiprocessing
 from zmq.eventloop import ioloop, zmqstream
 from zmq.utils import jsonapi as json
 
+from room.utils.log import logging
+
 class ZmqProcess(multiprocessing.Process):
     """
     This is the base for all processes and offers utility functions 
@@ -95,8 +97,6 @@ class  MessageHandler(object):
     Inheriting classes only need to implement a handler function for each message type.
 
     """
-    def __init__(self, json_load=-1):
-        self._json_load = json_load
 
     def __call__(self, msg):
         """
@@ -104,23 +104,13 @@ class  MessageHandler(object):
         registered at. *msg* is a list as return by
         :meth:`zmq.core.socket.Socket.recv_multipart`.
         """
+        logging.info(msg)
+        method = msg[1].decode('utf-8')
+        data = json.loads(msg[2])
         
-        # Try to JSON-decode the index "self._json_load" of the message
-        i = self._json_load
-        msg_type, data = json.loads(msg[i]) # msg配列の一番最後が[msg_type, data]
-        msg[i] = data
-
         # Get the actual message handler and call it
-        if msg_type.startswith('_'):
-            raise AttributeError('%s starts with an "_"' % msg_type)
+        if method.startswith('_'):
+            raise AttributeError('%s starts with an "_"' % method)
 
-        getattr(self, msg_type)(*msg) # self.msg_typeと等価
-
-
-
-
-
-
-
-
+        getattr(self, method)(data)
 

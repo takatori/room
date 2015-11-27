@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from room.devices.forwarder_device import Forwarder
+from room.modules.devices.forwarder_device import Forwarder
 from room.utils.config import config
 
 def main():

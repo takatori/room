@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import zmq
 import logging
 import tornado.escape
 import tornado.ioloop
 import tornado.web
 import time
-
 from tornado.concurrent import Future
 from tornado import gen
 from zmq.utils import jsonapi as json
 
-from room.utils.publisher import Publisher
+from room.publisher import Publisher
 from room.utils import log
 from room.utils.config import config
 
-publisher = Publisher(config['router_parser_forwarder']['front_port'])
+publisher = Publisher(int(config['router_parser_forwarder']['front_port']))
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write("Front")
+        self.render("index.html")
 
 class DataHandler(tornado.web.RequestHandler):
     '''
@@ -32,12 +32,16 @@ class DataHandler(tornado.web.RequestHandler):
     def post(self):
         data = json.loads(self.request.body.decode('utf-8')) # jsonデータが投げられると断定
         log.logging.info(data)
-        data_type = data.pop('data_type')  # parserの種類
-        publisher.send(data_type, 'parse', data['data'])
+        parser_name = data.pop('data_type')
+        publisher.send(data['data'], title=parser_name)
         self.write(data)
     
-class Application(object):
 
+class Application(object):
+    '''
+    Webアプリケーション設定
+
+    '''
     def __init__(self):
         app = tornado.web.Application(
             [
@@ -45,6 +49,8 @@ class Application(object):
                 (r"/data", DataHandler),
             ],
             debug=config['server']['debug'],
+            template_path=os.path.join(os.getcwd(),  "templates"),
+            static_path=os.path.join(os.getcwd(),  "static"),            
         )
         app.listen(config['server']['port'])
         self._loop = tornado.ioloop.IOLoop.current()        

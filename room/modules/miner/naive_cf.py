@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from room.mining.mining import MiningModule, MiningHandler
+from room.miner import MinerModule, Miner
 from room.utils import converter
-from room.mining.naive_cf_data import NaiveCFData
-from room.mining.estimator import collaborative_filtering as cf
+from room.modules.miner.naive_cf_data import NaiveCFData
+from room.modules.miner.estimator import collaborative_filtering as cf
 from room.utils.config import config
 
-class NaiveCollaborativeFilteringModule(MiningModule):
+class NaiveCollaborativeFilteringModule(MinerModule):
 
     def __init__(self, port):
-        super().__init__('localhost:{0}'.format(port), NaiveCollaborativeFiltering())
+        super().__init__(
+            recv_addr='localhost:{0}'.format(config['buffer_core_forwarder']['back_port']),
+            send_addr=int(config['core_output_forwarder']['front_port']),
+            recv_title='',
+            send_title='',
+            miner=NaiveCollaborativeFiltering(),
+        )
 
-    def setup(self):
-        super().setup()
-
-class NaiveCollaborativeFiltering(MiningHandler):
+class NaiveCollaborativeFiltering(Miner):
 
     def __init__(self):
         self._data = NaiveCFData()
@@ -60,7 +63,7 @@ class NaiveCollaborativeFiltering(MiningHandler):
         )
     
 if __name__ == "__main__":
-    proc = NaiveCollaborativeFilteringModule(config['buffer_core_forwarder']['back_port'])
-    proc.run()
+    process = NaiveCollaborativeFilteringModule()
+    process.run()
     
     

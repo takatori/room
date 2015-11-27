@@ -1,26 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import parser_base
-
+from room import parser
 from room.utils.config import config
 
-class ApplianceParserModule(parser_base.ParserModule):
+class ApplianceParserModule(parser.ParserModule):
 
-    def __init__(self, port):
-        super().__init__('localhost:{0}'.format(port), ApplianceParser())
+    def __init__(self):
+        super().__init__(
+            recv_addr='localhost:{0}'.format(config['router_parser_forwarder']['back_port']),
+            send_addr=int(config['parser_buffer_forwarder']['front_port']),
+            recv_title='appliance_status',
+            send_title='',
+            category='appliance',
+            parser=ApplianceParser()
+        )
 
-    def setup(self):
-        super().setup('appliance_status')
-
-class ApplianceParser(parser_base.Parser):
+class ApplianceParser(parser.Parser):
         
     def parse(self, data):
         data.pop('time')
-        return [('appliance', {key: data[key]}) for key in data.keys()]
+        return [{key: data[key]} for key in data.keys()]
 
     
 if __name__ == "__main__":
-    proc = ApplianceParserModule(config['router_parser_forwarder']['back_port'])
-    proc.run()
+    process = ApplianceParserModule()
+    process.run()
         
