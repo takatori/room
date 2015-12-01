@@ -8,7 +8,7 @@ from room import zmq_base as base
 
 class DatabaseModule(base.ZmqProcess):
     
-    def __init__(self, recv_addr, recv_title, database):
+    def __init__(self, recv_addr, recv_title, db):
         super().__init__()
         self.sub_stream = None        
         self.recv_addr  = recv_addr
