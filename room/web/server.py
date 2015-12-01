@@ -15,8 +15,9 @@ from zmq.utils import jsonapi as json
 from room.publisher import Publisher
 from room.utils import log
 from room.utils.config import config
+from room.utils.config import network_config
 
-publisher = Publisher(int(config['router_parser_forwarder']['front_port']))
+publisher = Publisher(int(network_config['forwarder1']['front']))
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):

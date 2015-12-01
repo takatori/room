@@ -5,14 +5,14 @@ from room.miner import MinerModule, Miner
 from room.utils import converter
 from room.modules.miner.naive_cf_data import NaiveCFData
 from room.modules.miner.estimator import collaborative_filtering as cf
-from room.utils.config import config
+from room.utils.config import network_config
 
 class NaiveCollaborativeFilteringModule(MinerModule):
 
     def __init__(self, port):
         super().__init__(
-            recv_addr='localhost:{0}'.format(config['buffer_core_forwarder']['back_port']),
-            send_addr=int(config['core_output_forwarder']['front_port']),
+            recv_addr='localhost:{0}'.format(network_config['forwarder4']['back']),
+            send_addr=int(network_config['forwarder5']['front']),                        
             recv_title='',
             send_title='',
             miner=NaiveCollaborativeFiltering(),

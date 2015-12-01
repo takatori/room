@@ -1,22 +1,30 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from room.buffer.buffer import BufferModule, StateHandler
+from room.buffer import BufferModule, StateHandler
+from room.state import State
 from room.utils.config import config
+from room.utils.config import network_config
 
 class DefaultBufferModule(BufferModule):
 
-    def __init__(self, port):
-        super().__init__('localhost:{0}'.format(port), DefaultStateHandler())
-    
-    def setup(self):
-        super().setup(keyword=config['default_buffer']['keyword'],
-                      period=int(config['default_buffer']['interval']))
+    def __init__(self):
+        super().__init__(
+            recv_addr='localhost:{0}'.format(network_config['forwarder2']['back']),
+            send_addr=int(network_config['forwarder3']['front']),
+            recv_title=config['default_buffer']['keyword'],
+            send_title='',
+            state_handler=DefaultStateHandler(),
+            period=int(config['default_buffer']['interval'])
+        )
         
 class DefaultStateHandler(StateHandler):
+
+    def __init__(self):
+        self._state = State()
         
-    def __call__(self):
-        self._publisher.send('', 'mining', self._state.to_json_at_now())
+    def dump(self):
+        return self._state.dump_at_now()
 
     def update_sensor(self, data):
         key,value = list(data.items())[0]
@@ -31,7 +39,8 @@ class DefaultStateHandler(StateHandler):
 
     def get_appliance(self):
         return self._state._applianece_state
-        
+
+            
 if __name__ == "__main__":
-    proc = DefaultBufferModule(config['parser_buffer_forwarder']['back_port'])
-    proc.run()
+    process = DefaultBufferModule()
+    process.run()

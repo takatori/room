@@ -3,13 +3,11 @@
 
 import zmq
 import time
-import json
 from zmq.eventloop.ioloop import PeriodicCallback
 from abc import ABCMeta,abstractmethod
 
-from room.buffer.state import State
-from room.utils import zmq_base as base
-from room.utils.publisher import Publisher
+from room import zmq_base as base
+from room.publisher import Publisher
 from room.utils.config import config
 from room.utils.log import logging
 
@@ -20,17 +18,16 @@ class BufferModule(base.ZmqProcess):
         self.sub_stream    = None
         self.timer         = None        
         self.recv_addr     = recv_addr
-        self.send_addr     = send_addr
         self.recv_title    = recv_title
-        self.send_title    = send_title        
         self.state_handler = state_handler
-        self.publisher     = Publisher(self.send_addr)
+        self.period        = period
+        self.callback      = Callback(Publisher(send_addr, send_title), self.state_handler)
         
     def setup(self):
         super().setup() 
-        self.sub_stream, _ = self.stream(zmq.SUB, self.recv_addr, bind=False, subscribe=recv_title.encode('utf-8'))
+        self.sub_stream, _ = self.stream(zmq.SUB, self.recv_addr, bind=False, subscribe=self.recv_title.encode('utf-8'))
         self.sub_stream.on_recv(SubStreamHandler(self.sub_stream, self.stop, self.state_handler))
-        self.timer = PeriodicCallback(self.publisher.send(self.state_handler), self.period, self.loop)
+        self.timer = PeriodicCallback(self.callback, self.period, self.loop)
 
     def run(self):
         self.setup()
@@ -62,12 +59,8 @@ class SubStreamHandler(base.MessageHandler):
 
 class StateHandler(metaclass=ABCMeta):
 
-    def __init__(self):
-        self._state = State()
-        self._publisher = Publisher(config['buffer_core_forwarder']['front_port'])
-
     @abstractmethod
-    def __call__(self):
+    def dump(self):
         raise NotImplementedError()
         
     @abstractmethod
@@ -78,4 +71,14 @@ class StateHandler(metaclass=ABCMeta):
     def update_appliance(self, data):
         raise NotImplementedError()
 
+    
+class Callback(object):
+
+    def __init__(self, publisher, state_handler):
+        self.publisher = publisher
+        self.state_handler = state_handler
+
+    def __call__(self):
+        data = self.state_handler.dump()
+        self.publisher.send(data)
     

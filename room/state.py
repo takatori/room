@@ -15,7 +15,7 @@ class State:
         self._applianece_state = {} # applianceの状態を保持する辞書
         
     def __str__(self):
-        return str(self.to_json_at_now())
+        return str(self.dump_at_now())
 
     def format_sensors(self, keys, value):
         for key in keys:
@@ -61,39 +61,31 @@ class State:
     def get_appliance_value(self, key):
         return self._applianece_state[key]
     
-    def to_json(self):
+    def dump(self):
         '''
-        sensor, applianceの状態をjsonにして返す
+        sensor, applianceの状態を辞書にして返す
 
-        @return str
+        @return dict
         '''                
-        return json.dumps(
-            {
-                "sensors": self._sensor_state,
-                "appliances": self._applianece_state
-            }, sort_keys=True)
+        return {"sensors": self._sensor_state, "appliances": self._applianece_state}
 
-    def to_json_with_timestamp(self, time):
+
+    def dump_with_timestamp(self, time):
         '''
-        timestampを付与してjsonで返す
+        timestampを付与して辞書で返す
 
-        @return str
+        @return dict
         '''
-        return json.dumps(
-            {
-                "timestamp": str(time),
-                "sensors": self._sensor_state,
-                "appliances": self._applianece_state
-            }, sort_keys=True)
+        return {"timestamp": str(time), "sensors": self._sensor_state, "appliances": self._applianece_state}
 
 
-    def to_json_at_now(self):
+    def dump_at_now(self):
         '''
-        現在の時刻をタイムスタンプとしてjsonを返す
+        現在の時刻をタイムスタンプとして辞書を返す
 
-        @return str
+        @return dict
         '''
         tz = pytz.timezone('Asia/Tokyo')
         now = datetime.now(tz)
-        return self.to_json_with_timestamp(now)
+        return self.dump_with_timestamp(now)
     

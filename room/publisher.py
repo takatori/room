@@ -13,14 +13,16 @@ class Publisher(object):
     
     '''
     
-    def __init__(self, port):
+    def __init__(self, port, title=''):
         '''
         ソケットの作成
-
         @param port: 送り先ポート
+        @param title: メッセージの先頭に付与される文字列、subscriberはこれを参照してパケットを取得するか破棄するかを決める
         '''
         assert isinstance(port, int), '[type error]: {0} != int'.format(port)
+        assert isinstance(title, str), '[type error]: {0} != str'.format(title)
         
+        self.title = title
         context = zmq.Context() # Context作成
         self._sock = context.socket(zmq.PUB) # Publish用のソケット作成
         log.logging.info(port)
@@ -39,7 +41,10 @@ class Publisher(object):
         assert isinstance(method, str), '[type error]: {0} != str'.format(method)
         assert isinstance(data, str) or isinstance(data, dict), '[type error]: {0} != str || dict'.format(data)
 
-        payload = json.dumps(data) # obj を JSON 形式の str に直列化
+        if title:
+            self.title = title  # send時にtitleが設定されていればその値を使用する
+            
+        payload = json.dumps(data, sort_keys=True) # obj を JSON 形式の str に直列化
         self._sock.send_multipart([title.encode('utf-8'), method.encode('utf-8'), payload])
 
     def stop(self):

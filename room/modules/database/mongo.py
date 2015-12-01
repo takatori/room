@@ -5,12 +5,13 @@ from pymongo import MongoClient
 
 from room import database
 from room.utils.config import config
+from room.utils.config import network_config
 
 class MongoModule(database.DatabaseModule):
 
     def __init__(self, port):
         super().__init__(
-            recv_addr='localhost:{0}'.format(config['buffer_core_forwarder']['back_port']),
+            recv_addr='localhost:{0}'.format(network_config['forwarder3']['back']),
             recv_title=config['mongo']['keyword'],
             db=MongoDB()
         )
