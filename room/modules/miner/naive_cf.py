@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from room.miner import MinerModule, Miner
-from room.utils import converter
 from room.modules.miner.naive_cf_data import NaiveCFData
 from room.modules.miner.estimator import collaborative_filtering as cf
 from room.utils.config import network_config

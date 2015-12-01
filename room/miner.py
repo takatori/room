@@ -5,7 +5,7 @@ import zmq
 from abc import ABCMeta, abstractmethod
 
 from room import zmq_base as base
-from room.utils.publisher import Publisher
+from room.publisher import Publisher
 
 class MinerModule(base.ZmqProcess):
 
