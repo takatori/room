@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from room import parser
-from room.utils.config import config
+from room.utils.config import network_config
 
 class DefaultParserModule(parser.ParserModule):
 
