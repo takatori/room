@@ -22,7 +22,7 @@ class MinerModule(base.ZmqProcess):
     def setup(self):
         super().setup()
         self.sub_stream, _ = self.stream(zmq.SUB, self.recv_addr, bind=False, subscribe=self.recv_title.encode('utf-8'))
-        self.sub_stream.on_recv(SubStreamHandler(self.sub_stream, self.stop, ,self.send_addr, self.send_title, self.miner))
+        self.sub_stream.on_recv(SubStreamHandler(self.sub_stream, self.stop, self.send_addr, self.send_title, self.miner))
 
     def run(self):
         self.setup()
