@@ -3,7 +3,6 @@
 
 import pandas as pd
 import numpy as np
-from room.utils import converter
 import json
 
 pd.set_option('max_columns', 500) 

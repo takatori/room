@@ -30,11 +30,9 @@ def forward(front_port, backend_port):
         print("bringing down zmq device")
             
     finally:
-        pass
-    
-    frontend.close()
-    backend.close()
-    context.term()
+        frontend.close()
+        backend.close()
+        context.term()
 
     
 if __name__ == '__main__':

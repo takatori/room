@@ -13,7 +13,7 @@ class DatabaseModule(base.ZmqProcess):
         self.sub_stream = None        
         self.recv_addr  = recv_addr
         self.recv_title = recv_title
-        self.db = database
+        self.db = db
     
     def setup(self):
         super().setup()
