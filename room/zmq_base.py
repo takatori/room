@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import zmq
+import json
 import multiprocessing
 from zmq.eventloop import ioloop, zmqstream
-from zmq.utils import jsonapi as json
+
 
 from room.utils.log import logging
 
