@@ -54,7 +54,7 @@ class SubStreamHandler(base.MessageHandler):
         self._publisher = Publisher(send_addr)
 
     def execute(self, data):
-        parsed_data = self._parser.parse(data)
+        parsed_data = self._parser.parse(json.loads(data))
         for msg in parsed_data:
             self._publisher.send(msg, self._send_title, self._category)
         

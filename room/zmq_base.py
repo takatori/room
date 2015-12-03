@@ -107,7 +107,6 @@ class  MessageHandler(object):
         logging.info(msg)
         method = msg[1].decode('utf-8')
         data = json.loads(msg[2])
-        
         # Get the actual message handler and call it
         if method.startswith('_'):
             raise AttributeError('%s starts with an "_"' % method)
