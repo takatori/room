@@ -3,6 +3,8 @@
 
 import zmq
 import time
+import os
+import signal
 from  multiprocessing import Process
 
 from room.utils import log
@@ -55,8 +57,8 @@ def main():
     finally:
         for p in processes:
             if p.is_alive():
-                p.terminate()
-                time.sleep(0.1)            
+                os.kill(p.pid, signal.SIGINT)
+                p.join()
                 
 if __name__ == '__main__':
     main()
