@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import zmq
-import json
 import multiprocessing
 from zmq.eventloop import ioloop, zmqstream
-
+from zmq.utils import jsonapi as json
 
 from room.utils.log import logging
 
@@ -114,7 +113,4 @@ class  MessageHandler(object):
             raise AttributeError('%s starts with an "_"' % method)
 
         getattr(self, method)(data)
-
-
-
 
