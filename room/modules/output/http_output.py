@@ -2,6 +2,7 @@
 
 import uuid
 from tornado import gen
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
 from room.output import OutputModule, Action
 from room.utils.config import config, network_config
@@ -19,7 +20,7 @@ class HttpOutputModule(OutputModule):
 class HttpOut(Action):
     @gen.coroutine
     def action(self, data):
-        from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+
         http_client = AsyncHTTPClient()
         for appliance, method in data:
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}            
