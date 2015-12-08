@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import uuid
+import urllib.parse
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
@@ -20,12 +21,12 @@ class HttpOutputModule(OutputModule):
 class HttpOut(Action):
     @gen.coroutine
     def action(self, data):
-
         http_client = AsyncHTTPClient()
         for appliance, method in data:
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}            
             payload = {"recommend_id": str(uuid.uuid4()), "appliance": appliance, "method": method}
-            request = HTTPRequest(config['http_output']['url'], 'POST', headers, body=payload)
+            urlencoded_payload = urllib.parse.urlencode(payload)
+            request = HTTPRequest(config['http_output']['url'], 'POST', headers, body=urlencoded_payload)
             response = yield http_client.fetch(request)
             print(response)
         
