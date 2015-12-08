@@ -45,7 +45,7 @@ class SubStreamHandler(base.MessageHandler):
 
     def execute(self, data):
         result = self._miner.mining(data)
-        self._publisher.send(str(result), self._send_title)
+        self._publisher.send(result, self._send_title)
         
     def stop(self, data):
         self._stop()
