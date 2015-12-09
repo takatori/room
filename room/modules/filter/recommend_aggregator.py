@@ -17,6 +17,17 @@ class RecommendAggregatorModule(filter.FilterModule):
 
 
 class RecommendAggregator(filter.Filter):
+    '''
+    連続したレコメンドを一つに集約するためのフィルタ
+    一つ前のレコメンド集合と現在のレコメンド集合の
+    差分があればそのレコメンドを含む配列を返す
+    差分がなければ空配列を返す
+
+        current                              prev                                     out
+    [('viera,'on'), ('fan','on')]             []                        [('viera,'on'), ('fan','on')]
+    [('viera,'on')]                [('viera,'on'), ('fan','on')]                       []
+    [('viera,'on')]                     [('viera,'on')]                                []
+    '''
 
     def __init__(self):
         # 一つ前のレコメンドのリスト
@@ -26,7 +37,10 @@ class RecommendAggregator(filter.Filter):
         
     def filtrate(self, data):
         dataset = set(data) # list to set
-        result = dataset.difference(self.previous_recommends) # 差集合
+
+        # 差集合
+        # (現在のレコメンド群) - (一つ前のレコメンド群) = (新しく追加されたレコメンド)
+        result = dataset.difference(self.previous_recommends) 
         self.previous_recommends = dataset 
         return list(result)
         
