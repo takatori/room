@@ -19,9 +19,7 @@ class InOutParserModule(parser.ParserModule):
 class InOutParser(parser.Parser):
         
     def parse(self, data):
-        user = data['user']
-        state = 1 if data['state'] == 'in' else 0
-        return [{user: state}]
+        return [{user: 1 if data[user] == 'in' else 0 } for user in data.keys()]
 
     
 if __name__ == "__main__":
