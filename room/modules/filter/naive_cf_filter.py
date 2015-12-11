@@ -55,7 +55,7 @@ class NaiveCFFilter(filter.Filter):
         ]
 
         self.appliances = [
-            "aircon", "viera", "fan", "floorlight", "curtain", "ceilingLight"
+            "aircon", "viera", "fan", "floorlight", "curtain", "ceilinglight"
         ]
         
 
