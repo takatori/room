@@ -27,7 +27,8 @@ class NaiveCollaborativeFiltering(Miner):
         df = self._data.add(data) # dataに追加
         index = len(data['sensors'].keys())
         sensor_df, appliance_df = self._data.split(df) # dataframeを分割
-        return self.recommend(sensor_df.values[0], appliance_df.values[0])
+        result = self.recommend(sensor_df.values[0], appliance_df.values[0]) 
+        return [{'appliance': recommend[0], 'method': recommend[1]} for recommend in result] # to json format
         
     def load(self):
         '''

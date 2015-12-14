@@ -22,7 +22,9 @@ class HttpOut(Action):
     @gen.coroutine
     def action(self, data):
         http_client = AsyncHTTPClient()
-        for appliance, method in data:
+        for recommend in data:
+            appliance = recommend['appliance']
+            method    = recommend['method']
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}            
             payload = {"recommend_id": str(uuid.uuid4()), "appliance": appliance, "method": method}
             urlencoded_payload = urllib.parse.urlencode(payload)

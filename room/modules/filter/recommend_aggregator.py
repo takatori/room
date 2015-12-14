@@ -36,13 +36,14 @@ class RecommendAggregator(filter.Filter):
 
         
     def filtrate(self, data):
-        dataset = set(data) # list to set
-
+        dataset = set([(recommend['appliance'], recommend['method']) for recommend in data]) # list[dict] to set
+        
         # 差集合
         # (現在のレコメンド群) - (一つ前のレコメンド群) = (新しく追加されたレコメンド)
         result = dataset.difference(self.previous_recommends) 
-        self.previous_recommends = dataset 
-        return list(result)
+        self.previous_recommends = dataset
+        
+        return [{'appliance': recommend[0], 'method': recommend[1]} for recommend in result] # to json format    
         
         
 if __name__ == "__main__":
