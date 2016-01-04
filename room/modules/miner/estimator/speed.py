@@ -67,10 +67,10 @@ class SPEED(object):
 
     def calc_probability(self, event, context):
         '''
-        入力されたイベントが現在の状態の後に起こる確率を計算する
+        入力されたイベントが過去の状態(tree)とcontextの下で起こる確率を計算する
 
         '''
-        # print(event, context) # DEBUG
+        print(event, context) # DEBUG
         
         occurrence_c  = self.tree[context] # total occurrence of episodes of k-1 length
         ck = context + event 
@@ -81,9 +81,9 @@ class SPEED(object):
         child_nodes_occurrence = sum([self.tree[node] for node in child_nodes])
         num_c0 = self.tree[context] - child_nodes_occurrence # total number of null outcomes after exploring the current episode
 
-        # print(ce) # DEBUG        
-        # print(num_c, num_ck, num_ce) # DEBUG
-        # print('-------------------') # DEBUG
+        print(child_nodes) # DEBUG        
+        print(occurrence_c, occurrence_ck, num_c0) # DEBUG
+        print('-------------------') # DEBUG
 
         if occurrence_c == 0:
             return occurrence_ck / child_nodes_occurrence
@@ -92,7 +92,13 @@ class SPEED(object):
             
 
     def make_decition(self):
-        pass
+        '''
+        '''
+        events = ['A', 'B', 'C', 'D', 'a', 'b', 'c', 'd']
+        # context = ''.join(self.window)
+        context = 'dc'
+        result = [(e, self.calc_probability(e, context)) for e in events]
+        return result
 
 
 if __name__ == "__main__":
@@ -103,4 +109,6 @@ if __name__ == "__main__":
         speed.execute(i)
     
     #speed.calc_probability('b', ''.join(speed.window))
-    print(speed.calc_probability('d', 'Ada'))
+    #print(speed.calc_probability('d', 'Ada'))
+
+    print(speed.make_decition())
