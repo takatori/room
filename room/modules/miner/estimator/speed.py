@@ -14,6 +14,7 @@ class SPEED(object):
         self.window = []
         self.max_episode_length = 1
         self.tree = defaultdict(int)
+
         
     def execute(self, event):
         '''
@@ -34,6 +35,7 @@ class SPEED(object):
             
         #print(self.max_episode_length, str(self.window))
         print(self.tree)
+        return self.make_decition()
 
     def generate_contexts(self, episode):
         '''
@@ -88,15 +90,16 @@ class SPEED(object):
         if occurrence_c == 0:
             return occurrence_ck / child_nodes_occurrence
         else:
-            return (occurrence_ck / occurrence_c) + (num_c0 / occurrence_c) * self.calc_probability(event, context[:-1])
+            return (occurrence_ck / occurrence_c) + (num_c0 / occurrence_c) * self.calc_probability(event, context[:-1]) # Pk = ck/c + ce/c * Pk-1
             
 
     def make_decition(self):
         '''
+        
         '''
         events = ['A', 'B', 'C', 'D', 'a', 'b', 'c', 'd']
-        # context = ''.join(self.window)
-        context = 'dc'
+        context = ''.join(self.window)
+        #context = 'dc'
         result = [(e, self.calc_probability(e, context)) for e in events]
         return result
 
@@ -106,7 +109,7 @@ if __name__ == "__main__":
     input = ['A', 'B', 'b', 'D', 'C', 'c', 'a', 'B', 'C', 'b', 'd', 'c', 'A', 'D', 'a', 'B', 'A', 'd', 'a', 'b']
 
     for i in input:
-        speed.execute(i)
+        print(speed.execute(i))
     
     #speed.calc_probability('b', ''.join(speed.window))
     #print(speed.calc_probability('d', 'Ada'))
