@@ -64,8 +64,8 @@ class SPEED(object):
         ex: ('viera', 'on') -> ('viera', 'off')
           :  A -> a
         '''
-        return event.swapcase() # 大文字小文字を入れ替える
-        #return (event[0], 'off') if event[1] == 'on' else (event[0], 'on') # on と off の入れ替え
+        #return event.swapcase() # 大文字小文字を入れ替える
+        return (event[0], 'off') if event[1] == 'on' else (event[0], 'on') # on と off の入れ替え
 
 
 
@@ -74,7 +74,7 @@ class SPEED(object):
         入力されたイベントが過去の状態(tree)とcontextの下で起こる確率を計算する
 
         '''
-        # print(event, node) # DEBUG
+        #print(event, node) # DEBUG
         if not isinstance(node, Node): return 0
         
         occurrence_c  = node.occurrence # total occurrence of episodes of k-1 length
@@ -84,12 +84,14 @@ class SPEED(object):
         child_nodes_occurrence = sum([c.occurrence for c in node.children])
         num_c0 = node.occurrence - child_nodes_occurrence # total number of null outcomes after exploring the current episode
 
-        #print(occurrence_c, occurrence_ck, num_c0) # DEBUG
-        #print('-------------------') # DEBUG
+        # print(occurrence_c, occurrence_ck, num_c0) # DEBUG
+        # print('-------------------') # DEBUG
 
         if occurrence_c == 0:
+            # print('{0}(ck)/{1}(c)'.format(occurrence_ck, child_nodes_occurrence))
             return occurrence_ck / child_nodes_occurrence
         else:
+            # print('{0}(ck)/{1}(c), {2}(c0)/{1}(c)'.format(occurrence_ck, occurrence_c, num_c0))
             return (occurrence_ck / occurrence_c) + (num_c0 / occurrence_c) * self.calc_probability(event, node.parent) # Pk = ck/c + ce/c * Pk-1
 
 
@@ -100,7 +102,6 @@ class SPEED(object):
         '''
         events = [c.event for c in self.tree.root.children] # アトミックなイベント
         context = self.window
-        print(context)
         result = [(e, self.calc_probability(e, self.tree.trace(self.tree.root, context))) for e in events] # 全てのイベントに対して現在のコンテキストの後に発生する確率を計算する
         return result
 
@@ -159,42 +160,81 @@ class ContextTree(object):
         return None
     
 
-    def print_tree(self, node):
-
+    def print_tree(self, node, line=[], depth=0):
+        '''
+        木構造を表示する
+        
+        '''
         if len(node.children) == 0:
-            print(node.event)            
+            print(' ' * (depth - len(line)) * 9, end='')
+            for n in line:
+                print('({0},{1:>3})'.format(n.event, n.occurrence), end='')
+                print('--', end='')
+            print(' {0}'.format(depth))
+            line[:] = []
             return
         
         for c in node.children:
-            print(c.parent.event)
-            self.print_tree(c)
-    
+            line.append(c)
+            depth += 1
+            self.print_tree(c, line, depth)
+            depth -= 1
+
             
 class Node(object):
     '''
+
     '''
     def __init__(self, parent, event, occurrence=1):
-        self.parent = parent
-        self.children = []
+        self.parent = parent 
+        self.children = [] 
         self.event = event
-        self.occurrence = occurrence
+        self.occurrence = occurrence # 発生回数
         
 
     def __eq__(self, event):
-        #if self.event[0] == event[0] and self.event[1] == event[1]:
+        '''
         if self.event[0] == event:
             return True
         else:
             return False
+        '''
+        if event and self.event[0] == event[0] and self.event[1] == event[1]:
+            return True
+        else:
+            return False
 
-    
-
+        
 if __name__ == "__main__":
     speed = SPEED()
-    input = ['A', 'B', 'b', 'D', 'C', 'c', 'a', 'B', 'C', 'b', 'd', 'c', 'A', 'D', 'a', 'B', 'A', 'd', 'a', 'b']
-    
+    #input = ['A', 'B', 'b', 'D', 'C', 'c', 'a', 'B', 'C', 'b', 'd', 'c', 'A', 'D', 'a', 'B', 'A', 'd', 'a', 'b']
+    # A -> viera on
+    # B -> light
+    # C -> fan
+    # D -> tv
+    input = [('viera', 'on'),
+             ('light', 'on'),
+             ('light', 'off'),
+             ('tv', 'on'),
+             ('fan', 'on'),
+             ('fan', 'off'),
+             ('viera', 'off'),
+             ('light', 'on'),
+             ('fan', 'on'),
+             ('light', 'off'),
+             ('tv', 'off'),
+             ('fan', 'off'),
+             ('viera', 'on'),
+             ('tv','on'),
+             ('viera','off'),
+             ('light','on'),
+             ('viera','on'),
+             ('tv','off'),
+             ('viera','off'),
+             ('light','off')]
     for i in input:
-        print(speed.execute(i))
+        speed.execute(i)
 
-    print(speed.calc_probability('c', speed.tree.trace(speed.tree.root, ['A', 'd', 'a'])))
-    #print(speed.make_decition())
+    speed.tree.print_tree(speed.tree.root)
+    print(speed.calc_probability(('light', 'off'), speed.tree.trace(speed.tree.root, [('viera', 'on'), ('tv', 'off'), ('viera', 'off')])))
+    print(speed.make_decition())
