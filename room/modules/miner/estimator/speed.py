@@ -74,7 +74,6 @@ class SPEED(object):
         入力されたイベントが過去の状態(tree)とcontextの下で起こる確率を計算する
 
         '''
-        #print(event, node) # DEBUG
         if not isinstance(node, Node): return 0
         
         occurrence_c  = node.occurrence # total occurrence of episodes of k-1 length
@@ -84,14 +83,9 @@ class SPEED(object):
         child_nodes_occurrence = sum([c.occurrence for c in node.children])
         num_c0 = node.occurrence - child_nodes_occurrence # total number of null outcomes after exploring the current episode
 
-        # print(occurrence_c, occurrence_ck, num_c0) # DEBUG
-        # print('-------------------') # DEBUG
-
         if occurrence_c == 0:
-            # print('{0}(ck)/{1}(c)'.format(occurrence_ck, child_nodes_occurrence))
             return occurrence_ck / child_nodes_occurrence
         else:
-            # print('{0}(ck)/{1}(c), {2}(c0)/{1}(c)'.format(occurrence_ck, occurrence_c, num_c0))
             return (occurrence_ck / occurrence_c) + (num_c0 / occurrence_c) * self.calc_probability(event, node.parent) # Pk = ck/c + ce/c * Pk-1
 
 
@@ -156,7 +150,6 @@ class ContextTree(object):
         '''
         for node in children:
             if node == event: return node
-
         return None
     
 
