@@ -34,7 +34,7 @@ class SPEED(object):
                 self.update_tree(self.generate_contexts(episode)) # treeを更新
                 break
             
-        return self.make_decition()
+        return self.recommend()
 
     def generate_contexts(self, episode):
         '''
@@ -89,16 +89,24 @@ class SPEED(object):
             return (occurrence_ck / occurrence_c) + (num_c0 / occurrence_c) * self.calc_probability(event, node.parent) # Pk = ck/c + ce/c * Pk-1
 
 
-
-    def make_decition(self):
+    def prediction(self):
         '''
         
         '''
         events = [c.event for c in self.tree.root.children] # アトミックなイベント
         context = self.window
-        result = [(e, self.calc_probability(e, self.tree.trace(self.tree.root, context))) for e in events] # 全てのイベントに対して現在のコンテキストの後に発生する確率を計算する
-        return result
+        return [(e, self.calc_probability(e, self.tree.trace(self.tree.root, context))) for e in events] # 全てのイベントに対して現在のコンテキストの後に発生する確率を計算する
 
+    
+    def recommend(self, threshold=0.5):
+        ranking = sorted(self.prediction(), key=lambda x:x[1], reverse=True)
+
+        if ranking and ranking[0][1] > threshold:
+            return ranking[0][0]
+        else:
+            return None
+        
+        
 
 class ContextTree(object):
     '''
@@ -159,9 +167,9 @@ class ContextTree(object):
         
         '''
         if len(node.children) == 0:
-            print(' ' * (depth - len(line)) * 9, end='')
+            print(' ' * (depth - len(line)) * 15, end='')
             for n in line:
-                print('({0},{1:>3})'.format(n.event, n.occurrence), end='')
+                print('[{0},{1}]'.format(n.event, n.occurrence), end='')
                 print('--', end='')
             print(' {0}'.format(depth))
             line[:] = []
@@ -226,8 +234,8 @@ if __name__ == "__main__":
              ('viera','off'),
              ('light','off')]
     for i in input:
-        speed.execute(i)
+        print(speed.execute(i))
 
     speed.tree.print_tree(speed.tree.root)
     print(speed.calc_probability(('light', 'off'), speed.tree.trace(speed.tree.root, [('viera', 'on'), ('tv', 'off'), ('viera', 'off')])))
-    print(speed.make_decition())
+    print(speed.recommend())
