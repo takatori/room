@@ -13,7 +13,7 @@ class DefaultBufferModule(BufferModule):
             recv_addr='localhost:{0}'.format(network_config['forwarder2']['back']),
             send_addr=int(network_config['forwarder3']['front']),
             recv_title='',
-            send_title='naive_cf',
+            send_title='',
             state_handler=DefaultStateHandler(),
             period=int(config['default_buffer']['interval'])
         )

@@ -11,7 +11,7 @@ class NaiveCFFilterModule(filter.FilterModule):
             recv_addr='localhost:{0}'.format(network_config['forwarder3']['back']),
             send_addr=int(network_config['forwarder4']['front']),            
             recv_title='',
-            send_title='',
+            send_title='naive_cf',
             filter=NaiveCFFilter()
         )
 
