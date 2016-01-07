@@ -32,11 +32,13 @@ class EventExtractor(filter.Filter):
         @override
         @param data: ex: {'viera', 0}
         '''
-        if self.previous_status[data[0]] == data[1]: # 状態が変化していなければNoneを返す
-            return {}
-        else:
-            self.previous_status[data[0]] = data[1] # 保持している状態を変更する
+        key, value = data.items()[0]
+
+        if not key in self.previous_status or self.previous_status[key] != value: # 新規のイベントか状態が変化していれば
+            self.previous_status[key] = value
             return data
+        else:
+            return None
 
 if __name__ == "__main__":
     process =  EventExtractorModule()
@@ -45,8 +47,3 @@ if __name__ == "__main__":
 
 
         
-
-
-
-
-
