@@ -38,6 +38,15 @@ class EventExtractor(filter.Filter):
             self.previous_status[data[0]] = data[1] # 保持している状態を変更する
             return data
 
+if __name__ == "__main__":
+    process =  EventExtractorModule()
+    process.run()
+        
 
 
         
+
+
+
+
+
