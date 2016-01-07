@@ -25,7 +25,7 @@ class SpeedPack(Miner):
     def mining(self, data):
         result = self.speed.execute(list(data.items())[0])
         if result:
-            return result
+            return {result[0]:result[1]} # tuple to dict
         else:
             return []
 
