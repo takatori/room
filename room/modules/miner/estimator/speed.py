@@ -7,9 +7,9 @@ from collections import defaultdict
 class SPEED(object):
     '''
     Markov chain
+    イベントを予測する
 
     '''
-
     def __init__(self):
         self.window = []
         self.max_episode_length = 1
@@ -91,7 +91,8 @@ class SPEED(object):
 
     def prediction(self):
         '''
-        
+        各イベントごとに現在の状態の次に起こる確率を計算する
+
         '''
         events = [c.event for c in self.tree.root.children] # アトミックなイベント
         context = self.window
@@ -99,6 +100,10 @@ class SPEED(object):
 
     
     def recommend(self, threshold=0.5):
+        '''
+        閾値以上の確率で起こるイベントを一つ推薦する
+
+        '''
         ranking = sorted(self.prediction(), key=lambda x:x[1], reverse=True)
 
         if ranking and ranking[0][1] > threshold:
@@ -184,6 +189,7 @@ class ContextTree(object):
             
 class Node(object):
     '''
+    各コンテキストの発生回数を保持する
 
     '''
     def __init__(self, parent, event, occurrence=1):
