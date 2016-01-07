@@ -65,8 +65,8 @@ class SPEED(object):
           :  A -> a
         '''
         #return event.swapcase() # 大文字小文字を入れ替える
-        return (event[0], 'off') if event[1] == 'on' else (event[0], 'on') # on と off の入れ替え
-
+        #return (event[0], 'off') if event[1] == 'on' else (event[0], 'on') # on と off の入れ替え
+        return (event[0], 0) if event[1] == 1 else (event[0], 1) # on と off の入れ替え
 
 
     def calc_probability(self, event, node):
@@ -219,29 +219,29 @@ if __name__ == "__main__":
     # B -> light
     # C -> fan
     # D -> tv
-    input = [('viera', 'on'),
-             ('light', 'on'),
-             ('light', 'off'),
-             ('tv', 'on'),
-             ('fan', 'on'),
-             ('fan', 'off'),
-             ('viera', 'off'),
-             ('light', 'on'),
-             ('fan', 'on'),
-             ('light', 'off'),
-             ('tv', 'off'),
-             ('fan', 'off'),
-             ('viera', 'on'),
-             ('tv','on'),
-             ('viera','off'),
-             ('light','on'),
-             ('viera','on'),
-             ('tv','off'),
-             ('viera','off'),
-             ('light','off')]
+    input = [('viera', 1),
+             ('light', 1),
+             ('light', 0),
+             ('tv', 1),
+             ('fan', 1),
+             ('fan', 0),
+             ('viera', 0),
+             ('light', 1),
+             ('fan', 1),
+             ('light', 0),
+             ('tv', 0),
+             ('fan', 0),
+             ('viera', 1),
+             ('tv',1),
+             ('viera',0),
+             ('light',1),
+             ('viera',1),
+             ('tv',0),
+             ('viera',0),
+             ('light',0)]
     for i in input:
         print(speed.execute(i))
 
     speed.tree.print_tree(speed.tree.root)
-    print(speed.calc_probability(('light', 'off'), speed.tree.trace(speed.tree.root, [('viera', 'on'), ('tv', 'off'), ('viera', 'off')])))
+    print(speed.calc_probability(('light', 0), speed.tree.trace(speed.tree.root, [('viera', 1), ('tv', 0), ('viera', 0)])))
     print(speed.recommend())
