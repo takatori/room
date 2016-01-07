@@ -7,16 +7,18 @@ from collections import defaultdict
 class SPEED(object):
     '''
     Markov chain
+    イベントを予測する
 
     '''
-
     def __init__(self):
         self.window = []
         self.max_episode_length = 1
-        self.tree = defaultdict(int)
-        
+        self.tree = ContextTree()
+
     def execute(self, event):
         '''
+        @param event: ('appliance', 'method')
+
         '''
         self.window.append(event) # windowに追加
         e = self.opposite(event) # 逆のイベントを取得
@@ -32,27 +34,27 @@ class SPEED(object):
                 self.update_tree(self.generate_contexts(episode)) # treeを更新
                 break
             
-        #print(self.max_episode_length, str(self.window))
-        print(self.tree)
+        return self.recommend()
 
     def generate_contexts(self, episode):
         '''
         episodeの中のeventの組み合わせを羅列する
+
+        @param episode: list
         '''
         result = []
-        
         for i in range(0, len(episode)):
-            tmp = '';
+            tmp = [];
             for j in range(i, len(episode)):
-                tmp += episode[j]
-                result.append(tmp)
-                
-        return result
+                tmp.append(episode[j])
+                result.append(tmp[:]) # pythonの引数は参照渡しなのでtmpを渡すと次のループで書き換えられてしまう。そのため[:]で配列をコピーして渡す
+        return sorted(result, key=len)
 
-    
     def update_tree(self, contexts):
-        for c in contexts:
-            self.tree[c]  += 1
+        '''
+        '''
+        for context in contexts:
+            self.tree.upsert(context)
 
     
     def opposite(self, event):
@@ -62,53 +64,184 @@ class SPEED(object):
         ex: ('viera', 'on') -> ('viera', 'off')
           :  A -> a
         '''
-        return event.swapcase() # 大文字小文字を入れ替える
+        #return event.swapcase() # 大文字小文字を入れ替える
+        return (event[0], 'off') if event[1] == 'on' else (event[0], 'on') # on と off の入れ替え
 
 
-    def calc_probability(self, event, context):
+
+    def calc_probability(self, event, node):
         '''
         入力されたイベントが過去の状態(tree)とcontextの下で起こる確率を計算する
 
         '''
-        print(event, context) # DEBUG
+        if not isinstance(node, Node): return 0
         
-        occurrence_c  = self.tree[context] # total occurrence of episodes of k-1 length
-        ck = context + event 
-        occurrence_ck = self.tree[ck] # total occurrence φ event after exploring the current episode
+        occurrence_c  = node.occurrence # total occurrence of episodes of k-1 length
+        ck = self.tree.search_child(node.children, event)
+        occurrence_ck = 0 if ck == None else ck.occurrence # total occurrence φ event after exploring the current episode
 
-        pattern = r"^{0}.$".format(context) # contextプラス一文字にマッチする ex: Ab -> Aba, Abb...
-        child_nodes = [key for key in self.tree.keys() if re.match(pattern, key)] # 子ノード
-        child_nodes_occurrence = sum([self.tree[node] for node in child_nodes])
-        num_c0 = self.tree[context] - child_nodes_occurrence # total number of null outcomes after exploring the current episode
-
-        print(child_nodes) # DEBUG        
-        print(occurrence_c, occurrence_ck, num_c0) # DEBUG
-        print('-------------------') # DEBUG
+        child_nodes_occurrence = sum([c.occurrence for c in node.children])
+        num_c0 = node.occurrence - child_nodes_occurrence # total number of null outcomes after exploring the current episode
 
         if occurrence_c == 0:
             return occurrence_ck / child_nodes_occurrence
         else:
-            return (occurrence_ck / occurrence_c) + (num_c0 / occurrence_c) * self.calc_probability(event, context[:-1])
+            return (occurrence_ck / occurrence_c) + (num_c0 / occurrence_c) * self.calc_probability(event, node.parent) # Pk = ck/c + ce/c * Pk-1
+
+
+    def prediction(self):
+        '''
+        各イベントごとに現在の状態の次に起こる確率を計算する
+
+        '''
+        events = [c.event for c in self.tree.root.children] # アトミックなイベント
+        context = self.window
+        return [(e, self.calc_probability(e, self.tree.trace(self.tree.root, context))) for e in events] # 全てのイベントに対して現在のコンテキストの後に発生する確率を計算する
+
+    
+    def recommend(self, threshold=0.5):
+        '''
+        閾値以上の確率で起こるイベントを一つ推薦する
+
+        '''
+        ranking = sorted(self.prediction(), key=lambda x:x[1], reverse=True)
+
+        if ranking and ranking[0][1] > threshold:
+            return ranking[0][0]
+        else:
+            return None
+        
+        
+
+class ContextTree(object):
+    '''
+    過去の履歴を保持するためのツリー
+
+    '''
+
+    def __init__(self):
+        self.root = Node(parent=None, event='Root', occurrence=0)
+
+        
+    def upsert(self, context):
+        '''
+        contextが存在していればoccurenceをインクリメント
+        存在していなければtreeにnodeを追加
+
+        '''
+        target = self.trace(self.root, context)
+
+        if isinstance(target, Node):
+            target.occurrence += 1 # update
+        else:
+            current_node = target[0] 
+            new_node = Node(parent=current_node, event=target[1])
+            current_node.children.append(new_node) # insert
+        
+    def trace(self, node, context):
+        '''
+        木をたどる
+
+        @param context: list ex: [('viera', 'on'), ('light', 'off')]
+        '''
+        if len(context) == 0: return node # treeの最後まで辿れた
+
+        child = self.search_child(node.children, context[0])
+        if child:
+            return self.trace(child, context[1:]) # 次のノードを探索
+        else:
+            # contextが残っているが、次のノードが見つからなかった場合
+            # 短いcontextから追加していくので、
+            # nodeが見つからないcontextは必ず要素が一つになるはずなのでcontext[0]としている
+            # 辿れた一番最後のnodeと残りのevent(contextシークエンスの最後)を返す
+            return (node, context[0])
             
 
-    def make_decition(self):
+    def search_child(self, children, event):
         '''
+        子ノードに指定されたイベントを持つノードがあるかを判定する
         '''
-        events = ['A', 'B', 'C', 'D', 'a', 'b', 'c', 'd']
-        # context = ''.join(self.window)
-        context = 'dc'
-        result = [(e, self.calc_probability(e, context)) for e in events]
-        return result
+        for node in children:
+            if node == event: return node
+        return None
+    
 
+    def print_tree(self, node, line=[], depth=0):
+        '''
+        木構造を表示する
+        
+        '''
+        if len(node.children) == 0:
+            print(' ' * (depth - len(line)) * 15, end='')
+            for n in line:
+                print('[{0},{1}]'.format(n.event, n.occurrence), end='')
+                print('--', end='')
+            print(' {0}'.format(depth))
+            line[:] = []
+            return
+        
+        for c in node.children:
+            line.append(c)
+            depth += 1
+            self.print_tree(c, line, depth)
+            depth -= 1
 
+            
+class Node(object):
+    '''
+    各コンテキストの発生回数を保持する
+
+    '''
+    def __init__(self, parent, event, occurrence=1):
+        self.parent = parent 
+        self.children = [] 
+        self.event = event
+        self.occurrence = occurrence # 発生回数
+        
+
+    def __eq__(self, event):
+        '''
+        if self.event[0] == event:
+            return True
+        else:
+            return False
+        '''
+        if event and self.event[0] == event[0] and self.event[1] == event[1]:
+            return True
+        else:
+            return False
+
+        
 if __name__ == "__main__":
     speed = SPEED()
-    input = ['A', 'B', 'b', 'D', 'C', 'c', 'a', 'B', 'C', 'b', 'd', 'c', 'A', 'D', 'a', 'B', 'A', 'd', 'a', 'b']
-
+    #input = ['A', 'B', 'b', 'D', 'C', 'c', 'a', 'B', 'C', 'b', 'd', 'c', 'A', 'D', 'a', 'B', 'A', 'd', 'a', 'b']
+    # A -> viera on
+    # B -> light
+    # C -> fan
+    # D -> tv
+    input = [('viera', 'on'),
+             ('light', 'on'),
+             ('light', 'off'),
+             ('tv', 'on'),
+             ('fan', 'on'),
+             ('fan', 'off'),
+             ('viera', 'off'),
+             ('light', 'on'),
+             ('fan', 'on'),
+             ('light', 'off'),
+             ('tv', 'off'),
+             ('fan', 'off'),
+             ('viera', 'on'),
+             ('tv','on'),
+             ('viera','off'),
+             ('light','on'),
+             ('viera','on'),
+             ('tv','off'),
+             ('viera','off'),
+             ('light','off')]
     for i in input:
-        speed.execute(i)
-    
-    #speed.calc_probability('b', ''.join(speed.window))
-    #print(speed.calc_probability('d', 'Ada'))
+        print(speed.execute(i))
 
-    print(speed.make_decition())
+    speed.tree.print_tree(speed.tree.root)
+    print(speed.calc_probability(('light', 'off'), speed.tree.trace(speed.tree.root, [('viera', 'on'), ('tv', 'off'), ('viera', 'off')])))
+    print(speed.recommend())
