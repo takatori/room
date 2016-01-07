@@ -12,7 +12,7 @@ class NaiveCollaborativeFilteringModule(MinerModule):
         super().__init__(
             recv_addr='localhost:{0}'.format(network_config['forwarder4']['back']),
             send_addr=int(network_config['forwarder5']['front']),                        
-            recv_title='',
+            recv_title='naive_cf',
             send_title='',
             miner=NaiveCollaborativeFiltering(),
         )
