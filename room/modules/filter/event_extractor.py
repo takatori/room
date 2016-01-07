@@ -32,7 +32,7 @@ class EventExtractor(filter.Filter):
         @override
         @param data: ex: {'viera', 0}
         '''
-        if self.previous_status[data[0]] == data[1]:　# 状態が変化していなければNoneを返す
+        if self.previous_status[data[0]] == data[1]: # 状態が変化していなければNoneを返す
             return {}
         else:
             self.previous_status[data[0]] = data[1] # 保持している状態を変更する

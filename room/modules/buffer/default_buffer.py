@@ -12,7 +12,7 @@ class DefaultBufferModule(BufferModule):
         super().__init__(
             recv_addr='localhost:{0}'.format(network_config['forwarder2']['back']),
             send_addr=int(network_config['forwarder3']['front']),
-            recv_title=config['default_buffer']['keyword'],
+            recv_title='',
             send_title='',
             state_handler=DefaultStateHandler(),
             period=int(config['default_buffer']['interval'])
