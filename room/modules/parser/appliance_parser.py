@@ -11,7 +11,7 @@ class ApplianceParserModule(parser.ParserModule):
             recv_addr='localhost:{0}'.format(network_config['forwarder1']['back']),
             send_addr=int(network_config['forwarder2']['front']),
             recv_title='appliance_status',
-            send_title='appliance',
+            send_title='event',
             category='appliance',
             parser=ApplianceParser()
         )
