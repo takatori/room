@@ -45,7 +45,8 @@ class SubStreamHandler(base.MessageHandler):
 
     def execute(self, data):
         result = self._filter.filtrate(data)
-        self._publisher.send(result, self._send_title)
+        if result:
+            self._publisher.send(result, self._send_title)
         
     def stop(self, data):
         self._stop()
