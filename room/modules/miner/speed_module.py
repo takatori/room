@@ -23,8 +23,11 @@ class SpeedPack(Miner):
         self.speed = SPEED()
 
     def mining(self, data):
-        print(data)
-        return self.speed.execute(list(data.items())[0])
+        result = self.speed.execute(list(data.items())[0])
+        if result:
+            return result
+        else:
+            return []
 
 
 if __name__ == "__main__":
