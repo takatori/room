@@ -11,7 +11,7 @@ class ApplianceParserModule(parser.ParserModule):
             recv_addr='localhost:{0}'.format(network_config['forwarder1']['back']),
             send_addr=int(network_config['forwarder2']['front']),
             recv_title='appliance_status',
-            send_title='',
+            send_title='appliance',
             category='appliance',
             parser=ApplianceParser()
         )
@@ -21,7 +21,6 @@ class ApplianceParser(parser.Parser):
     def parse(self, data):
         data.pop('time')
         return [{key: data[key]} for key in data.keys()]
-
     
 if __name__ == "__main__":
     process = ApplianceParserModule()
