@@ -14,7 +14,7 @@ class CBRBufferModule(BufferModule):
             send_addr=int(network_config['forwarder3']['front']),
             recv_title='',
             send_title='cbr',
-            state_handler=DefaultStateHandler(),
+            state_handler=CBRStateHandler(),
             period=int(config['cbr_buffer']['interval_ms'])
         )
         
