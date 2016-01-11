@@ -12,6 +12,7 @@ class State:
     '''
     def __init__(self):
         self._sensor_state = {} # sensorの状態を保持する辞書
+        self._inout_state = {} # 入退室の状態を保持する辞書
         self._applianece_state = {} # applianceの状態を保持する辞書
         
     def __str__(self):
@@ -24,13 +25,24 @@ class State:
     def format_appliances(self, keys,value):
         for key in keys:
             self._applianece_state[key] = value
-        
+
+    def format_inout(self, keys, value):
+        for key in keys:
+            self._inout_state[key] = value
+
     def update_sensor(self, key, value):
         '''
         sensorの状態を更新する
 
         '''
         self._sensor_state[key] = value
+
+    def update_inout(self, key, value):
+        '''
+        入退室の状態を更新する
+
+        '''
+        self._inout_state[key] = value
 
     def update_appliance(self, key, value):
         '''
@@ -47,6 +59,11 @@ class State:
         '''
         return self._sensor_state.keys()
 
+
+    def get_inout_keys(self):
+        return self._inout_state.keys()
+    
+
     def get_appliance_keys(self):
         '''
         applianceの種類を取得する
@@ -58,6 +75,11 @@ class State:
     def get_sensor_value(self, key):
         return self._sensor_state[key]
 
+
+    def get_inout_value(self, key):
+        return self._inout_state[key]
+    
+
     def get_appliance_value(self, key):
         return self._applianece_state[key]
     
@@ -67,7 +89,7 @@ class State:
 
         @return dict
         '''                
-        return {"sensors": self._sensor_state, "appliances": self._applianece_state}
+        return {"sensors": self._sensor_state, "inout": self._inout_state, "appliances": self._applianece_state}
 
 
     def dump_with_timestamp(self, time):
@@ -76,7 +98,7 @@ class State:
 
         @return dict
         '''
-        return {"timestamp": str(time), "sensors": self._sensor_state, "appliances": self._applianece_state}
+        return {"timestamp": str(time), "sensors": self._sensor_state, "inout": self._inout_state, "appliances": self._applianece_state}
 
 
     def dump_at_now(self):
