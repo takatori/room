@@ -11,7 +11,7 @@ class CBRModule(MinerModule):
         super().__init__(
             recv_addr='localhost:{0}'.format(network_config['forwarder3']['back']),
             send_addr=int(network_config['forwarder4']['front']),                        
-            recv_title='cbr',
+            recv_title='',
             send_title='cbr',
             miner=CBR(),
         )
