@@ -47,12 +47,9 @@ class SubStreamHandler(base.MessageHandler):
         self._stop = stop
         self._state_handler = state_handler
 
-    def sensor(self, data):
-        self._state_handler.update_sensor(data)
-
-    def appliance(self, data):
-        self._state_handler.update_appliance(data)
-
+    def execute(self, data):
+        self._state_handler.buffering(data)
+        
     def stop(self, data):
         self._stop()
 
@@ -62,14 +59,10 @@ class StateHandler(metaclass=ABCMeta):
     @abstractmethod
     def dump(self):
         raise NotImplementedError()
-        
-    @abstractmethod
-    def update_sensor(self, data):
-        raise NotImplementedError()
 
     @abstractmethod    
-    def update_appliance(self, data):
-        raise NotImplementedError()
+    def buffering(self, data):
+        raise NotImplementedError()        
 
     
 class Callback(object):
