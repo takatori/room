@@ -12,7 +12,7 @@ class InOutParserModule(parser.ParserModule):
             send_addr=int(network_config['forwarder2']['front']),            
             recv_title='inout',
             send_title='event',
-            category='sensor',
+            category='inout',
             parser=InOutParser()
         )
 
