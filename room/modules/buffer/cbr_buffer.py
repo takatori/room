@@ -27,7 +27,7 @@ class CBRStateHandler(StateHandler):
         return self._state.dump_at_now()
 
     def buffering(self, data):
-        , category = list(data.items())[0]
+        _, category = list(data.items())[0]
         key,value = list(data.items())[1]
 
         if category == 'sensor':
