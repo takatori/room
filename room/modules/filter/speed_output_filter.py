@@ -49,5 +49,5 @@ class SpeedFilter(filter.Filter):
             return data
 
 if __name__ == "__main__":
-    process =  SpeedFilterModule()
+    process =  SpeedOutPutFilterModule()
     process.run()
