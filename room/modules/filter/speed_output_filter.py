@@ -40,13 +40,13 @@ class SpeedFilter(filter.Filter):
         ]
 
     def filtrate(self, data):
-
-        key = list(data.keys())[0]
+        result = []
         
-        if key in self.inout:
-            return None
-        else:
-            return data
+        for recommend in data:
+            if recommend[0] not in self.inout:
+                result.append(recommend)
+
+        return result
 
 if __name__ == "__main__":
     process =  SpeedOutPutFilterModule()
