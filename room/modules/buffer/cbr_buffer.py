@@ -27,16 +27,18 @@ class CBRStateHandler(StateHandler):
         return self._state.dump_at_now()
 
     def buffering(self, data):
-        _, category = list(data.items())[0]
-        key,value = list(data.items())[1]
+        category = data['category']
+        key,value = list(data['msg'].items())[0]
 
         if category == 'sensor':
-            self._state.update_sensor(key, value)            
+            self._state.update_sensor(key, value)
         elif category == 'inout':
-            self._state.update_inout(key, value)            
+            self._state.update_inout(key, value)           
         elif category == 'appliance':
-            self._state.update_appliance(key, value)                        
-            
+            self._state.update_appliance(key, value)
+
+
+
 if __name__ == "__main__":
     process = CBRBufferModule()
     process.run()
