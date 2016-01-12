@@ -45,7 +45,7 @@ class Publisher(object):
             self.title = title  # send時にtitleが設定されていればその値を使用する
             
         payload = json.dumps(data, sort_keys=True) # obj を JSON 形式の str に直列化
-        self._sock.send_multipart([title.encode('utf-8'), method.encode('utf-8'), payload])
+        self._sock.send_multipart([self.title.encode('utf-8'), method.encode('utf-8'), payload])
 
     def stop(self):
         '''

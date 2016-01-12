@@ -9,7 +9,7 @@ class EventExtractorModule(filter.FilterModule):
     def __init__(self):
         super().__init__(
             recv_addr='localhost:{0}'.format(network_config['forwarder2']['back']),
-            send_addr=int(network_config['forwarder4']['front']),            
+            send_addr=int(network_config['forwarder3']['front']),            
             recv_title='event',
             send_title='speed',
             filter=EventExtractor()
@@ -32,7 +32,7 @@ class EventExtractor(filter.Filter):
         @override
         @param data: ex: {'viera', 0}
         '''
-        key, value = list(data.items())[0]
+        key, value = list(data['msg'].items())[0]
 
         if not key in self.previous_status or self.previous_status[key] != value: # 新規のイベントか状態が変化していれば
             self.previous_status[key] = value
