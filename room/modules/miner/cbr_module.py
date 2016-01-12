@@ -4,6 +4,8 @@
 from room.miner import MinerModule, Miner
 from room.modules.miner.estimator.case_based_reasoning import CBR as cbr
 from room.utils.config import network_config
+from room.utils.config import config
+from pymongo import MongoClient
 
 class CBRModule(MinerModule):
 
@@ -21,6 +23,8 @@ class CBR(Miner):
     def __init__(self):
         self.cbr = cbr()
         self.records = []
+        self.db = MongoDB()
+        self.load()
 
     def mining(self, data):
         result = self.cbr.recommend(data, self.records)
@@ -31,7 +35,21 @@ class CBR(Miner):
         self.records.append(data)
 
     def load(self):
-        pass
+        records = self.db.all()
+        for record in records:
+            self.add(record)
+            
+class MongoDB(object):
+
+    def __init__(self):
+        self._client     = MongoClient(config['mongo']['host'], int(config['mongo']['port']))
+        self._db         = self._client[config['mongo']['db']]
+        self._collection = self._db[config['mongo']['collection']]
+
+    def all(self):
+        return [record for record in self._collection.find()]
+
+        
     
 if __name__ == "__main__":
     process = CBRModule()
