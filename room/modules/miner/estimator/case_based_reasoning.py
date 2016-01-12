@@ -62,7 +62,7 @@ class CBR(object):
         
     def inout_dist(self, current, record):
 
-        totla_people_num = len(current.keys())
+        total_people_num = len(current.keys())
         if total_people_num == 0: return 1 # inout情報がない場合は完全に異なっているとして扱う
         
         dist = 0
@@ -72,7 +72,7 @@ class CBR(object):
             else:
                 dist += 1
 
-        return dist / totla_people_num
+        return dist / total_people_num
         
 
     
