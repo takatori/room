@@ -32,7 +32,7 @@ class EventExtractor(filter.Filter):
         @override
         @param data: ex: {'viera', 0}
         '''
-        key, value = list(data['data'].items())[0]
+        key, value = list(data['msg'].items())[0]
 
         if not key in self.previous_status or self.previous_status[key] != value: # 新規のイベントか状態が変化していれば
             self.previous_status[key] = value
