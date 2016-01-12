@@ -152,9 +152,9 @@ class CBR(object):
         for appliance, score in predictions:
             current_state = current['appliances'][appliance]
             if current_state == 0 and score >= on_threshold:
-                result.append((appliance, 1)) # onのレコメンド
+                result.append({appliance: 1}) # onのレコメンド
             elif current_state == 1 and score <= off_threshold:
-                result.append((appliance, 0)) # offのレコメンド
+                result.append({appliance: 0}) # offのレコメンド
 
         return result
                 
