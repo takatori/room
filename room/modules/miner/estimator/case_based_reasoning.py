@@ -136,11 +136,13 @@ class CBR(object):
         
         for record in records: # 全ての過去のレコードに対して
             sim = self.global_similarity(current, record) # 類似度計算
-            sim_sum += sim
-            for appliance in appliances: # 書く家電に対して
-                if appliance not in result: result[appliance] = 0
-                result[appliance] += sim * record['appliances'][appliance]
 
+            for appliance in appliances: # 各家電に対して
+                if appliance not in result: result[appliance] = 0
+                if appliance in record['appliances']: # レコードに存在していれば
+                    result[appliance] += sim * record['appliances'][appliance]
+                    sim_sum += sim
+                    
         return [(r[0], r[1] / sim_sum) for r in result.items()] # 正規化
 
 
