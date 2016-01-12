@@ -35,11 +35,9 @@ class CBR(object):
         '''
         self.update_sensor_stat(sensor, current_val) # 最大値・最小値更新
         max_dis = self.sensor_stat[sensor]['max'] - self.sensor_stat[sensor]['min']
-        
-        if max_dis == 0:
-            return 0
-        else:
-            return math.fabs(current_val - record_val) / max_dis
+        if max_dis == 0: return 0
+
+        return math.fabs(current_val - record_val) / max_dis
                         
 
         
@@ -50,6 +48,8 @@ class CBR(object):
         '''
         sensors = current.keys()
         sensor_num = len(sensors)
+        if sensor_num == 0: return 1 # ガード節
+        
         dist_sum = 0
         for sensor in sensors:
             if sensor in record:
@@ -63,6 +63,8 @@ class CBR(object):
     def inout_dist(self, current, record):
 
         totla_people_num = len(current.keys())
+        if total_people_num == 0: return 1 # inout情報がない場合は完全に異なっているとして扱う
+        
         dist = 0
         for user in current:
             if user in record and current[user] == record[user]:
