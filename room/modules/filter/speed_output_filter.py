@@ -10,7 +10,7 @@ class SpeedOutPutFilterModule(filter.FilterModule):
         super().__init__(
             recv_addr='localhost:{0}'.format(network_config['forwarder4']['back']),
             send_addr=int(network_config['forwarder5']['front']),            
-            recv_title='',
+            recv_title='speed',
             send_title='speed',
             filter=SpeedFilter()
         )

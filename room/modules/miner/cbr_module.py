@@ -16,7 +16,6 @@ class CBRModule(MinerModule):
             miner=CBR(),
         )
 
-
 class CBR(Miner):
 
     def __init__(self):
