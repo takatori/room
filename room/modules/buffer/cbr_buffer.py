@@ -13,7 +13,7 @@ class CBRBufferModule(BufferModule):
             recv_addr='localhost:{0}'.format(network_config['forwarder2']['back']),
             send_addr=int(network_config['forwarder3']['front']),
             recv_title='',
-            send_title='',
+            send_title='cbr',
             state_handler=CBRStateHandler(),
             period=int(config['cbr_buffer']['interval_ms'])
         )
