@@ -8,3 +8,7 @@ __pycache__
 
 # direnv
 .envrc
+
+# chainer
+mlp.model
+mlp.state
