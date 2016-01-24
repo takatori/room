@@ -8,10 +8,10 @@ class NNWConverterModule(filter.FilterModule):
 
     def __init__(self):
         super().__init__(
-            recv_addr='localhost:{0}'.format(network_config['forwarder4']['back']),
-            send_addr=int(network_config['forwarder5']['front']),            
-            recv_title='',
-            send_title='',
+            recv_addr='localhost:{0}'.format(network_config['forwarder3']['back']),
+            send_addr=int(network_config['forwarder6']['front']),            
+            recv_title='buffer',
+            send_title='nnw',
             filter=Converter()
         )
 
@@ -67,7 +67,7 @@ class Converter(filter.Filter):
     
 
     def filtrate(self, data):
-
+        
         sensors = data['sensors'] 
         inout   = data['inout']
         appliances = data['appliances']
@@ -81,12 +81,9 @@ class Converter(filter.Filter):
         
         d = d + [week, elapsed_minute] # data配列に追加
 
-        t = [appliances[x] if x in appliances else 0 for x in self.target_list]
-
         d = np.array(d)
-        t = np.array(t)
         
-        return {'data': d, 'target': t}
+        return {'data': d, 'target': appliances}
     
 
     

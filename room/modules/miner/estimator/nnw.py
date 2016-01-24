@@ -11,7 +11,7 @@ from chainer import optimizers
 from chainer import serializers
 from chainer import computational_graph
 
-from nnw_data import Data
+from room.modules.miner.estimator.nnw_data import Data
 
 class MLP(chainer.Chain):
     '''
@@ -34,6 +34,7 @@ class NeuralNetWork(object):
 
     def __init__(self, appliance):
         self.appliance = appliance
+        self.metadata_path = './estimator/metadata/'
         self.n_in = 34    # 入力層のユニット数
         self.n_units = 10 # 隠れ層のユニット数
         self.n_out = 2    # 出力層のユニット数
@@ -50,9 +51,9 @@ class NeuralNetWork(object):
         self.optimizer.setup(self.model)        
         
     def load_model(self):
-        if os.path.exists("./metadata/" + self.appliance + ".model"):
+        if os.path.exists(self.metadata_path + self.appliance + ".model"):
             print('Load model')            
-            serializers.load_npz("./metadata/" + self.appliance + ".model", self.model)        
+            serializers.load_npz(self.metadata_path + self.appliance + ".model", self.model)        
         
     def resume(self, resume, optimizer):
         print('Load optimizer state from', resume)
@@ -64,7 +65,7 @@ class NeuralNetWork(object):
 
     def output(self, x):        
         #return F.softmax(self.model.y).data # 先にtrainを実行している場合、model.yにforwardの結果が残ってるのでそれを利用する
-        return F.softmax(model.predictor(x)).data        
+        return F.softmax(self.model.predictor(x)).data        
 
     def predict(self, probabilities):
         return 0 if probabilities[0] > probabilities[1] else 1
@@ -133,14 +134,14 @@ class NeuralNetWork(object):
     def save(self):
         # Save the model and the optimizer
         print('save the model')
-        serializers.save_npz('./metadata/' + self.appliance + '.model', self.model)
+        serializers.save_npz(self.metadata_path + self.appliance + '.model', self.model)
         
         print('save the optimiezer')
-        serializers.save_npz('./metadata/' + self.appliance + '.state', self.optimizer)
+        serializers.save_npz(self.metadata_path + self.appliance + '.state', self.optimizer)
 
 
     def pre_learning(self):
-        if not os.path.exists('./metadata/' + self.appliance + '.model'):
+        if not os.path.exists(self.metadata_path + self.appliance + '.model'):
             print('start pre learning')
             self.batch_learning()
             print('end pre learning')
@@ -153,7 +154,7 @@ if __name__ == '__main__':
     data, target = data.load_data()
     d = chainer.Variable(data)
     t = chainer.Variable(target)
-    NNW.train(d, t) # offに偏るので全てを学習させない方が良い
+    # NNW.train(d, t) # offに偏るので全てを学習させない方が良い
     predict = [NNW.predict(probabilities) for probabilities in  NNW.output(d)]
     correct = t.data
 

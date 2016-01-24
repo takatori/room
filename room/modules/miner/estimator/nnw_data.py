@@ -97,7 +97,7 @@ class Data(object):
             elapsed_minute = date.time().hour * 60 + date.time().minute # 0時0分からの経過分数
             d = d + [week, elapsed_minute] # data配列に追加
 
-            t = 1 if record['appliances'][appliance] == 1 else 0  # 家電が存在していれば1それ以外は0
+            t = 1 if appliance in record['appliances'] and record['appliances'][appliance] == 1 else 0  # 家電が存在していれば1それ以外は0
 
             if t == 1:
                 on_count += 1
