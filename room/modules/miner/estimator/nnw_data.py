@@ -58,15 +58,34 @@ class Data(object):
             "viera"            
         ]
 
+    def load_data(self, num=None):
+
+        data = []
+        target = []
         
-    def load(self):
+        for record in self._collection.find()[:num]:
+            sensors = record['sensors'] 
+            inout   = record['inout']
+            sensors.update(inout) # 2つのdictを結合
+            d = [sensors[x] if x in sensors else 0 for x in self.data_list] # data_listの順にvalueを取り出し
+            date = parse(record['timestamp']) 
+            week = date.weekday() # 日付
+            elapsed_minute = date.time().hour * 60 + date.time().minute # 0時0分からの経過分数
+            d = d + [week, elapsed_minute] # data配列に追加
+            t = record['appliances']['viera']
+            data.append(d)
+            target.append(t)
+
+        return np.array(data).astype(np.float32), np.array(target).astype(np.int32)
+        
+    def load(self, appliance, num=None):
         cs27 = {}
         data_on = [] # 説明変数 入退室・センサ targetがonの場合
         data_off = [] # 説明変数 入退室・センサ targetがoffの場合       
         on_count = 0
         off_count = 0
         
-        for record in self._collection.find(): # fetch from mongodb
+        for record in self._collection.find()[:num]: # fetch from mongodb [:None] == [:]
 
             sensors = record['sensors'] 
             inout   = record['inout']
@@ -78,7 +97,7 @@ class Data(object):
             elapsed_minute = date.time().hour * 60 + date.time().minute # 0時0分からの経過分数
             d = d + [week, elapsed_minute] # data配列に追加
 
-            t = 1 if record['appliances']['aircon'] == 1 else 0  # 家電が存在していれば1それ以外は0
+            t = 1 if appliance in record['appliances'] and record['appliances'][appliance] == 1 else 0  # 家電が存在していれば1それ以外は0
 
             if t == 1:
                 on_count += 1
@@ -89,7 +108,6 @@ class Data(object):
 
         # onの方が圧倒的に少ないのでインバランスを解消する必要がある
         # onとoffのデータ数を同じにする
-        print(on_count)
         perm = np.random.permutation(off_count) # 0からoff_countまでの数字をrandomに並べた配列を返す
         data_on = np.array(data_on)  # numpy arrayに変換
         data_off = np.array(data_off)  # numpy arrayに変換

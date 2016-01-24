@@ -8,3 +8,7 @@ __pycache__
 
 # direnv
 .envrc
+
+# chainer
+*.model
+*.state
