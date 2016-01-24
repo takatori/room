@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import re
+from graphviz import Digraph
 from collections import defaultdict
+from room.modules.miner.estimator.speed_data import Data
 
 class SPEED(object):
     '''
@@ -14,7 +16,17 @@ class SPEED(object):
         self.window = []
         self.max_episode_length = 1
         self.tree = ContextTree()
+        self.pre_learning()
 
+    def pre_learning(self):
+        data = Data()
+        past_events = data.load()
+
+        for event in past_events:
+            self.execute(event)
+
+        # self.tree.print_tree()
+                    
     def execute(self, event):
         '''
         @param event: ('appliance', 'method')
@@ -99,7 +111,7 @@ class SPEED(object):
         return [(e, self.calc_probability(e, self.tree.trace(self.tree.root, context))) for e in events] # 全てのイベントに対して現在のコンテキストの後に発生する確率を計算する
 
     
-    def recommend(self, threshold=0.5):
+    def recommend(self, threshold=0.8):
         '''
         閾値以上の確率で起こるイベントを一つ推薦する
 
@@ -164,39 +176,48 @@ class ContextTree(object):
         for node in children:
             if node == event: return node
         return None
+
     
+    def walk(self, node, graph):
+        graph.node(str(node))
+        for child in node.children:
+            self.walk(child, graph)
+            graph.edge(str(node), str(child))
+    
+    def print_tree(self):
+        # formatはpngを指定(他にはPDF, PNG, SVGなどが指定可)
+        graph = Digraph(format='png')
+        graph.attr('node', shape='circle')
 
-    def print_tree(self, node, line=[], depth=0):
-        '''
-        木構造を表示する
+        self.walk(self.root, graph)
+        print(graph)
         
-        '''
-        if len(node.children) == 0:
-            print(' ' * (depth - len(line)) * 15, end='')
-            for n in line:
-                print('[{0},{1}]'.format(n.event, n.occurrence), end='')
-                print('--', end='')
-            print(' {0}'.format(depth))
-            line[:] = []
-            return
+        # binary_tree.pngで保存
+        graph.render('context_tree')
+        #graph.view()
         
-        for c in node.children:
-            line.append(c)
-            depth += 1
-            self.print_tree(c, line, depth)
-            depth -= 1
-
-            
 class Node(object):
     '''
     各コンテキストの発生回数を保持する
 
     '''
+    class_id = -1
+
+    @classmethod
+    def get_id(cls):
+        cls.class_id += 1
+        return cls.class_id
+    
     def __init__(self, parent, event, occurrence=1):
+        self.id = Node.get_id()
         self.parent = parent 
         self.children = [] 
         self.event = event
         self.occurrence = occurrence # 発生回数
+        
+    def __str__(self):
+        #return 'id:{0}, event:{1}, occ:{2}'.format(self.id, self.event, self.occurrence)
+        return '{0}-{1}-{2}'.format(self.id, self.event, self.occurrence)        
         
 
     def __eq__(self, event):
@@ -219,6 +240,7 @@ if __name__ == "__main__":
     # B -> light
     # C -> fan
     # D -> tv
+    '''
     input = [('viera', 1),
              ('light', 1),
              ('light', 0),
@@ -239,9 +261,16 @@ if __name__ == "__main__":
              ('tv',0),
              ('viera',0),
              ('light',0)]
+    
     for i in input:
         print(speed.execute(i))
 
-    speed.tree.print_tree(speed.tree.root)
-    print(speed.calc_probability(('light', 0), speed.tree.trace(speed.tree.root, [('viera', 1), ('tv', 0), ('viera', 0)])))
-    print(speed.recommend())
+    speed.tree.print_node()
+    #speed.tree.print_tree(speed.tree.root)
+    #print(speed.calc_probability(('light', 0), speed.tree.trace(speed.tree.root, [('viera', 1), ('tv', 0), ('viera', 0)])))
+    #print(speed.recommend())
+    '''
+    
+    speed.pre_learning()
+    print(speed.prediction())
+
