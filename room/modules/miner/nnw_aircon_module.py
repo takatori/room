@@ -30,7 +30,7 @@ class NeuralNetWork(Miner):
         return self.recommend(data['target'][self.appliance], predict)
 
     def predict(self, data):
-        return self.nnw.predict(np.array(data))[0]
+        return self.nnw.predict(np.array(data))
      
 
     def recommend(self, current, predict):
