@@ -79,7 +79,7 @@ class Converter(filter.Filter):
         sensors.update(inout) # 2つのdictを結合
         d = [sensors[x] if x in sensors else 0 for x in self.data_list] # data_listの順にvalueを取り出し
 
-        date = parse(record['timestamp']) 
+        date = parse(data['timestamp']) 
         week = date.weekday() # 日付
         elapsed_minute = date.time().hour * 60 + date.time().minute # 0時0分からの経過分数
         
