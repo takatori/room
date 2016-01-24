@@ -11,7 +11,7 @@ class RecommendAggregatorModule(filter.FilterModule):
             recv_addr='localhost:{0}'.format(network_config['forwarder4']['back']),
             send_addr=int(network_config['forwarder5']['front']),            
             recv_title='cbr',
-            send_title='',
+            send_title='cbr',
             filter=RecommendAggregator()
         )
 
