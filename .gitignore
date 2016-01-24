@@ -10,5 +10,5 @@ __pycache__
 .envrc
 
 # chainer
-mlp.model
-mlp.state
+*.model
+*.state
