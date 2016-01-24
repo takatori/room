@@ -18,7 +18,7 @@ class CBRBufferModule(BufferModule):
             period=int(config['cbr_buffer']['interval_ms'])
         )
         
-class DataStateHandler(StateHandler):
+class CBRStateHandler(StateHandler):
 
     def __init__(self):
         self._records = []
