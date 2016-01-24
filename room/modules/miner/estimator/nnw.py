@@ -34,7 +34,7 @@ class NeuralNetWork(object):
 
     def __init__(self, appliance):
         self.appliance = appliance
-        self.metadata_path = './estimator/metadata/'
+        self.metadata_path = os.environ['PYTHONPATH'] + '/room/modules/miner/estimator/metadata/'
         self.n_in = 34    # 入力層のユニット数
         self.n_units = 10 # 隠れ層のユニット数
         self.n_out = 2    # 出力層のユニット数
