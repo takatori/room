@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import numpy as np
 from datetime import datetime
 from dateutil.parser import parse
 
@@ -85,8 +84,6 @@ class Converter(filter.Filter):
         
         d = d + [week, elapsed_minute] # data配列に追加
 
-        d = np.array(d)
-        
         return {'data': d, 'target': appliances}
     
 

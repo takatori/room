@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import numpy as np
+
 from room.miner import MinerModule, Miner
 from room.modules.miner.estimator.nnw import NeuralNetWork as NNW
 from room.utils.config import network_config
@@ -28,8 +30,8 @@ class NeuralNetWork(Miner):
         return self.recommend(data['target'][self.appliance], predict)
 
     def predict(self, data):
-        return self.nnw.predict(data['data'])[0]
-    
+        return self.nnw.predict(np.array(data))[0]
+     
 
     def recommend(self, current, predict):
         if current != predict:
