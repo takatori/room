@@ -38,11 +38,9 @@ class NeuralNetWork(Miner):
             return [{'appliance': self.appliance, 'method': predict}]
         else:
             return []
-        
 
 if __name__ == "__main__":
     process = NNWModule()
     process.run()
-    
-    
+
 
