@@ -72,7 +72,7 @@ class NeuralNetWork(object):
         x = chainer.Variable(x)        
         return F.softmax(self.model.predictor(x)).data        
 
-    def convert(self, probabilities, threshold=0.7):
+    def convert(self, probabilities, threshold=0.8):
         '''
         確率を状態に変換する
         '''

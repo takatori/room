@@ -111,7 +111,7 @@ class SPEED(object):
         return [(e, self.calc_probability(e, self.tree.trace(self.tree.root, context))) for e in events] # 全てのイベントに対して現在のコンテキストの後に発生する確率を計算する
 
     
-    def recommend(self, threshold=0.7):
+    def recommend(self, threshold=0.6):
         '''
         閾値以上の確率で起こるイベントを一つ推薦する
 
