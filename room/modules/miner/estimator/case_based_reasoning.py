@@ -5,6 +5,8 @@ import math
 from datetime import datetime
 from dateutil.parser import parse 
 
+from room.utils.log import logging
+
 class CBR(object):
     '''
     事例ベース推論
@@ -149,6 +151,7 @@ class CBR(object):
     def recommend(self, current, records, on_threshold=0.8, off_threshold=0.2):
 
         predictions = self.prediction(current, records)
+        logging.info(str(predictions))
         result = []
 
         for appliance, score in predictions:

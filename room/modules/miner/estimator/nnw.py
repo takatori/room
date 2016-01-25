@@ -12,6 +12,7 @@ from chainer import serializers
 from chainer import computational_graph
 
 from room.modules.miner.estimator.nnw_data import Data
+from room.utils.log import logging
 
 class MLP(chainer.Chain):
     '''
@@ -75,6 +76,8 @@ class NeuralNetWork(object):
         '''
         確率を状態に変換する
         '''
+        logging.info('probability [0:{0}, 1:{1}]'.format(probabilities[0], probabilities[1]))
+        
         if probabilities[0] > threshold:
             return 0
         elif probabilities[1] > threshold:
