@@ -32,9 +32,8 @@ class NeuralNetWork(Miner):
     def predict(self, data):
         return self.nnw.predict(np.array(data))
      
-
     def recommend(self, current, predict):
-        if current != predict:
+        if predict is not None and current != predict:
             return [{'appliance': self.appliance, 'method': predict}]
         else:
             return []

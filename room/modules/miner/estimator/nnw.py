@@ -67,10 +67,14 @@ class NeuralNetWork(object):
         #return F.softmax(self.model.y).data # 先にtrainを実行している場合、model.yにforwardの結果が残ってるのでそれを利用する
         return F.softmax(self.model.predictor(x)).data        
 
-    def predict(self, probabilities):
-        return 0 if probabilities[0] > probabilities[1] else 1
-    
-        
+    def predict(self, probabilities, threshold=0.8):
+        if probabilities[0] > threshold:
+            return 0
+        elif probabilities[1] > threshold:
+            return 1
+        else:
+            return None
+
     def batch_training(self, x_train, y_train, batchsize):
 
         N = len(y_train) # データの行数
@@ -151,13 +155,13 @@ if __name__ == '__main__':
     NNW = NeuralNetWork('curtain')
     # NNW.batch_learning()
     data = Data()
-    data, target = data.load_data()
+    data, target = data.load_data(50000)
     d = chainer.Variable(data)
     t = chainer.Variable(target)
     # NNW.train(d, t) # offに偏るので全てを学習させない方が良い
     predict = [NNW.predict(probabilities) for probabilities in  NNW.output(d)]
     correct = t.data
-
+    print(str(predict))
     right = 0
     all = len(predict)
 
