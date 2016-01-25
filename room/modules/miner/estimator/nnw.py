@@ -63,11 +63,18 @@ class NeuralNetWork(object):
         # Pass the loss function (Classifier defines it) and its arguments        
         self.optimizer.update(self.model, x, t) # パラメータ更新
 
-    def output(self, x):        
+    def output(self, x):
+        '''
+        確率計算
+        '''
         #return F.softmax(self.model.y).data # 先にtrainを実行している場合、model.yにforwardの結果が残ってるのでそれを利用する
+        x = chainer.Variable(x)        
         return F.softmax(self.model.predictor(x)).data        
 
-    def predict(self, probabilities, threshold=0.8):
+    def convert(self, probabilities, threshold=0.8):
+        '''
+        確率を状態に変換する
+        '''
         if probabilities[0] > threshold:
             return 0
         elif probabilities[1] > threshold:
@@ -75,6 +82,14 @@ class NeuralNetWork(object):
         else:
             return None
 
+    def predict(self, x):
+        '''
+        複数のデータを一度に予測できる
+        @param x: 多次元配列 [[27..],[],[]] - 要素の一つ一つがnumpy.array型(要素np.float32)の配列
+        @return [p]: 予測値(0, 1, None)の配列
+        '''
+        return [self.convert(probabilities) for probabilities in self.output(x)]
+    
     def batch_training(self, x_train, y_train, batchsize):
 
         N = len(y_train) # データの行数
@@ -155,13 +170,12 @@ if __name__ == '__main__':
     NNW = NeuralNetWork('curtain')
     # NNW.batch_learning()
     data = Data()
-    data, target = data.load_data(50000)
-    d = chainer.Variable(data)
-    t = chainer.Variable(target)
+    data, target = data.load_data()
+    data = data.astype(np.float32)
+    target = target.astype(np.int32)
     # NNW.train(d, t) # offに偏るので全てを学習させない方が良い
-    predict = [NNW.predict(probabilities) for probabilities in  NNW.output(d)]
-    correct = t.data
-    print(str(predict))
+    predict = [NNW.convert(probabilities) for probabilities in  NNW.output(data)]
+    correct = target
     right = 0
     all = len(predict)
 

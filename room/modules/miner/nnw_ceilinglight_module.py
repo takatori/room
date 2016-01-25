@@ -30,7 +30,8 @@ class NeuralNetWork(Miner):
         return self.recommend(data['target'][self.appliance], predict)
 
     def predict(self, data):
-        return self.nnw.predict(np.array(data))
+        data = np.array([data]).astype(np.float32)        
+        return self.nnw.predict(data)[0]
 
     def recommend(self, current, predict):
         if predict is not None and current != predict:        
@@ -43,6 +44,6 @@ class NeuralNetWork(Miner):
 if __name__ == "__main__":
     process = NNWModule()
     process.run()
-    
-    
+
+
 
