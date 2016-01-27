@@ -58,7 +58,7 @@ class Data(object):
             "viera"            
         ]
 
-    def load_data(self, num=None):
+    def load_data(self, appliance, num=None):
 
         data = []
         target = []
@@ -72,11 +72,15 @@ class Data(object):
             week = date.weekday() # 日付
             elapsed_minute = date.time().hour * 60 + date.time().minute # 0時0分からの経過分数
             d = d + [week, elapsed_minute] # data配列に追加
-            t = record['appliances']['viera']
+            t = record['appliances'][appliance]
             data.append(d)
             target.append(t)
 
-        return np.array(data).astype(np.float32), np.array(target).astype(np.int32)
+        cs27 = {}
+        cs27['data'] = np.array(data).astype(np.float32)
+        cs27['target'] = np.array(target).astype(np.int32)
+
+        return cs27
         
     def load(self, appliance, num=None):
         cs27 = {}
@@ -106,20 +110,29 @@ class Data(object):
                 off_count += 1
                 data_off.append(d)                
 
+        print('on:{0}, off:{1}'.format(on_count, off_count))
         # onの方が圧倒的に少ないのでインバランスを解消する必要がある
         # onとoffのデータ数を同じにする
         perm = np.random.permutation(off_count) # 0からoff_countまでの数字をrandomに並べた配列を返す
-        data_on = np.array(data_on)  # numpy arrayに変換
-        data_off = np.array(data_off)  # numpy arrayに変換
-        data = np.r_[data_on, data_off[perm[:on_count]]] # onとoffのデータ数を合わせる。offのデータはrandomに取得
-        target = np.array([1] * on_count + [0] * on_count) # dataは前半がonで後半がoffになっているので、教師データをそのように作成する
 
-        perm = np.random.permutation(on_count * 2) # ランダムに並び替え
+        data = []
+        
+        for i in range(0, off_count): # オーバーサンプリング onを増やす
+            data.append(data_on[i % on_count])
+
+        data = np.array(data)  # numpy arrayに変換
+        data_off = np.array(data_off)  # numpy arrayに変換
+        
+        data = np.r_[data, data_off] # onとoffのデータ数を合わせる。offのデータはrandomに取得
+        target = np.array([1] * off_count + [0] * off_count) # dataは前半がonで後半がoffになっているので、教師データをそのように作成する
+
+        perm = np.random.permutation(off_count * 2) # ランダムに並び替え
         data = data[perm] 
         target = target[perm] 
         
         cs27['data'] = np.array(data)
         cs27['target'] = np.array(target)
+        print(cs27)
         return cs27
 
 
@@ -131,6 +144,6 @@ class Data(object):
 
 if __name__ == '__main__':
     data = Data()
-    data.load()
+    data.load('viera')
 
 

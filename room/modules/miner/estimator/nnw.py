@@ -18,17 +18,19 @@ class MLP(chainer.Chain):
     '''
     ネットワーク構造
     '''
-    def __init__(self, n_in, n_units, n_out):
+    def __init__(self, n_in, n_units, n2_units, n_out):
         super(MLP, self).__init__(
             l1=L.Linear(n_in, n_units),
-            l2=L.Linear(n_units, n_units),
-            l3=L.Linear(n_units, n_out),
+            l2=L.Linear(n_units, n2_units),
+            l3=L.Linear(n2_units, n2_units),            
+            l4=L.Linear(n2_units, n_out),
         )
 
     def __call__(self, x):
         h1 = F.relu(self.l1(x))
         h2 = F.relu(self.l2(h1))
-        return self.l3(h2)
+        h3 = F.relu(self.l3(h2))
+        return self.l3(h3)
     
 
 class NeuralNetWork(object):
@@ -38,6 +40,7 @@ class NeuralNetWork(object):
         self.metadata_path = os.environ['PYTHONPATH'] + '/room/modules/miner/estimator/metadata/'
         self.n_in = 34    # 入力層のユニット数
         self.n_units = 10 # 隠れ層のユニット数
+        self.n2_units = 5
         self.n_out = 2    # 出力層のユニット数
         self.setup_model() 
         self.setup_optimizer()
@@ -45,7 +48,7 @@ class NeuralNetWork(object):
         self.load_model()
         
     def setup_model(self):
-        self.model = L.Classifier(MLP(self.n_in, self.n_units, self.n_out), F.softmax_cross_entropy)
+        self.model = L.Classifier(MLP(self.n_in, self.n_units, self.n2_units, self.n_out), F.softmax_cross_entropy)
 
     def setup_optimizer(self):
         self.optimizer = optimizers.Adam()        
@@ -142,7 +145,7 @@ class NeuralNetWork(object):
         return x_train, y_train, x_test, y_test
         
 
-    def batch_learning(self, n_epoch=50, batchsize=100):
+    def batch_learning(self, n_epoch=100, batchsize=100):
 
         x_train, y_train, x_test, y_test = self.prepare_dataset()
 
@@ -170,12 +173,15 @@ class NeuralNetWork(object):
 
 if __name__ == '__main__':
 
-    NNW = NeuralNetWork('curtain')
-    # NNW.batch_learning()
+    appliance = 'aircon'
+    
+    NNW = NeuralNetWork(appliance)
+
     data = Data()
-    data, target = data.load_data()
-    data = data.astype(np.float32)
-    target = target.astype(np.int32)
+    cs27 = data.load_data(appliance)
+    data  = cs27['data'].astype(np.float32)
+    target = cs27['target'].astype(np.int32)
+    
     # NNW.train(d, t) # offに偏るので全てを学習させない方が良い
     predict = [NNW.convert(probabilities) for probabilities in  NNW.output(data)]
     correct = target
