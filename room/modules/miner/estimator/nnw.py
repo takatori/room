@@ -35,7 +35,7 @@ class MLP(chainer.Chain):
 
 class NeuralNetWork(object):
 
-    def __init__(self, appliance):
+    def __init__(self, appliance, pre_learning=False):
         self.appliance = appliance
         self.metadata_path = os.environ['PYTHONPATH'] + '/room/modules/miner/estimator/metadata/'
         self.n_in = 34    # 入力層のユニット数
@@ -44,8 +44,10 @@ class NeuralNetWork(object):
         self.n_out = 2    # 出力層のユニット数
         self.setup_model() 
         self.setup_optimizer()
-        self.pre_learning() # 事前学習を行う
-        self.load_model()
+        
+        if pre_learning:
+            self.pre_learning() # 事前学習を行う
+            self.load_model()
         
     def setup_model(self):
         self.model = L.Classifier(MLP(self.n_in, self.n_units, self.n2_units, self.n_out), F.softmax_cross_entropy)
@@ -173,7 +175,7 @@ class NeuralNetWork(object):
 
 if __name__ == '__main__':
 
-    appliance = 'aircon'
+    appliance = 'curtain'
     
     NNW = NeuralNetWork(appliance)
 
