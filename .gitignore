@@ -5,6 +5,10 @@
 *.pyc
 __pycache__
 .python-version
+build/
+dist/
+*.egg-info/
+
 
 # direnv
 .envrc
@@ -12,3 +16,6 @@ __pycache__
 # chainer
 *.model
 *.state
+
+
+
