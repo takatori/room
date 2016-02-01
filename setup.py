@@ -7,6 +7,7 @@ install_requires = [
     'pymongo',
     'pyzmq',
     'tornado',
+    'pypandoc',
 ]
 
 
@@ -47,7 +48,7 @@ except ImportError:
 
 dist = setup(  
         name='room',                        # パッケージ名
-        version='0.1.0',                    # バージョン
+        version='0.1.3',                    # バージョン
         author='takatorino',                # 作者の名前
         author_email='tktr3w5e0@gmail.com', # 連絡先
         url='https://github.com/takatori',  # GitHubのリポジトリとか
@@ -58,6 +59,5 @@ dist = setup(
         packages=find_packages(exclude=['examples', 'tests']),
         include_package_data=True,
         zip_safe=False,
-        long_description=read_md('README.md'), # Pypiのページで表示する説明文(README)
         install_requires=install_requires,     # インストールする依存パッケージ
 )
