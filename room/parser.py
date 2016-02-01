@@ -9,9 +9,6 @@ from abc import ABCMeta, abstractmethod
 
 from room import zmq_base as base
 from room.publisher import Publisher
-from room.utils.log import logging
-from room.utils.config import config
-
 
 class ParserModule(base.ZmqProcess):
 

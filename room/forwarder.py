@@ -52,7 +52,7 @@ def main():
             p.join()
 
     except Exception as e:
-        log.logging.info(e)
+        print(e)
 
     finally:
         for p in processes:
