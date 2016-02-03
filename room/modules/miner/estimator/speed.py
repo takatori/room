@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import re
-from graphviz import Digraph
 from collections import defaultdict
 from room.modules.miner.estimator.speed_data import Data
 
@@ -14,9 +13,10 @@ class SPEED(object):
     '''
     def __init__(self):
         self.window = []
+        self.episode = []
         self.max_episode_length = 1
         self.tree = ContextTree()
-        self.pre_learning()
+        #self.pre_learning()
 
     def pre_learning(self):
         data = Data()
@@ -25,7 +25,6 @@ class SPEED(object):
         for event in past_events:
             self.execute(event)
 
-        # self.tree.print_tree()
                     
     def execute(self, event):
         '''
@@ -36,23 +35,24 @@ class SPEED(object):
         e = self.opposite(event) # 逆のイベントを取得
 
         for i in range(0, len(self.window)-1): # windowの前から走査
-            if self.window[i] == e: # 入力されたイベントと逆のイベントがあれば
-                episode = self.window[i:] # 一連のエピソードを取得 ex: deABca -> ABca
-      
-                if len(episode) > self.max_episode_length: # エピソード長がmax_episode_lengthより長ければ更新
-                    self.max_episode_length = len(episode)
-
-                self.window = self.window[-self.max_episode_length:] # windowを更新
-                self.update_tree(self.generate_contexts(episode)) # treeを更新
-                break
             
-        return self.recommend()
+            if self.window[i] == e: # 入力されたイベントと逆のイベントがあれば
+                self.episode = self.window[i:] # 一連のエピソードを取得 ex: deABca -> ABca
+
+                if len(self.episode) > self.max_episode_length: # エピソード長がmax_episode_lengthより長ければ更新
+                    self.max_episode_length = len(self.episode)
+
+                self.window = self.window[-(self.max_episode_length+1):] # windowを更新
+                contexts = self.generate_contexts(self.episode)
+                self.update_tree(contexts) # treeを更新
+
+                return self.prediction()
 
     def generate_contexts(self, episode):
         '''
-        episodeの中のeventの組み合わせを羅列する
+        episodeの中のeventの組み合わせをparam
 
-        @param episode: list
+        @羅列する episode: list
         '''
         result = []
         for i in range(0, len(episode)):
@@ -60,6 +60,7 @@ class SPEED(object):
             for j in range(i, len(episode)):
                 tmp.append(episode[j])
                 result.append(tmp[:]) # pythonの引数は参照渡しなのでtmpを渡すと次のループで書き換えられてしまう。そのため[:]で配列をコピーして渡す
+
         return sorted(result, key=len)
 
     def update_tree(self, contexts):
@@ -78,7 +79,7 @@ class SPEED(object):
         '''
         #return event.swapcase() # 大文字小文字を入れ替える
         #return (event[0], 'off') if event[1] == 'on' else (event[0], 'on') # on と off の入れ替え
-        return (event[0], 0) if event[1] == 1 else (event[0], 1) # on と off の入れ替え
+        return (event[0], '0') if event[1] == 1 else (event[0], '1') # on と off の入れ替え
 
 
     def calc_probability(self, event, node):
@@ -86,7 +87,8 @@ class SPEED(object):
         入力されたイベントが過去の状態(tree)とcontextの下で起こる確率を計算する
 
         '''
-        if not isinstance(node, Node): return 0
+        if not isinstance(node, Node):
+            return 0
         
         occurrence_c  = node.occurrence # total occurrence of episodes of k-1 length
         ck = self.tree.search_child(node.children, event)
@@ -96,8 +98,10 @@ class SPEED(object):
         num_c0 = node.occurrence - child_nodes_occurrence # total number of null outcomes after exploring the current episode
 
         if occurrence_c == 0:
+            # print('{0}/{1} ) [{2}]'.format(occurrence_ck, child_nodes_occurrence, event))
             return occurrence_ck / child_nodes_occurrence
         else:
+            # print('{0}/{1} + {2}/{1} ( '.format(occurrence_ck, occurrence_c, num_c0), end='')
             return (occurrence_ck / occurrence_c) + (num_c0 / occurrence_c) * self.calc_probability(event, node.parent) # Pk = ck/c + ce/c * Pk-1
 
 
@@ -107,17 +111,17 @@ class SPEED(object):
 
         '''
         events = [c.event for c in self.tree.root.children] # アトミックなイベント
-        context = self.window
-        return [(e, self.calc_probability(e, self.tree.trace(self.tree.root, context))) for e in events] # 全てのイベントに対して現在のコンテキストの後に発生する確率を計算する
+        start_node = self.tree.walk(self.tree.root, self.episode)
+        return [(e, self.calc_probability(e, start_node)) for e in events] # 全てのイベントに対して現在のコンテキストの後に発生する確率を計算する
 
     
-    def recommend(self, threshold=0.6):
+    def recommend(self, threshold=0):
         '''
         閾値以上の確率で起こるイベントを一つ推薦する
 
         '''
         ranking = sorted(self.prediction(), key=lambda x:x[1], reverse=True)
-
+        # print(ranking[:3])
         if ranking and ranking[0][1] > threshold:
             return ranking[0][0]
         else:
@@ -167,7 +171,15 @@ class ContextTree(object):
             # nodeが見つからないcontextは必ず要素が一つになるはずなのでcontext[0]としている
             # 辿れた一番最後のnodeと残りのevent(contextシークエンスの最後)を返す
             return (node, context[0])
-            
+
+    def walk(self, node, episode):
+
+        if len(episode) == 0: return node
+
+        for child in node.children:
+            if child == episode[0]:
+                return self.walk(child, episode[1:])
+        
 
     def search_child(self, children, event):
         '''
@@ -177,25 +189,7 @@ class ContextTree(object):
             if node == event: return node
         return None
 
-    
-    def walk(self, node, graph):
-        graph.node(str(node))
-        for child in node.children:
-            self.walk(child, graph)
-            graph.edge(str(node), str(child))
-    
-    def print_tree(self):
-        # formatはpngを指定(他にはPDF, PNG, SVGなどが指定可)
-        graph = Digraph(format='png')
-        graph.attr('node', shape='circle')
-
-        self.walk(self.root, graph)
-        print(graph)
-        
-        # binary_tree.pngで保存
-        graph.render('context_tree')
-        #graph.view()
-        
+            
 class Node(object):
     '''
     各コンテキストの発生回数を保持する
@@ -231,16 +225,37 @@ class Node(object):
             return True
         else:
             return False
-
         
 if __name__ == "__main__":
     speed = SPEED()
-    #input = ['A', 'B', 'b', 'D', 'C', 'c', 'a', 'B', 'C', 'b', 'd', 'c', 'A', 'D', 'a', 'B', 'A', 'd', 'a', 'b']
+    count = 0
+    correct = 0
+    recommend = None
+    
+    for line in open('data.txt'):
+        line = line[:-1]
+        appliance, method = line.split(' ')
+        print('recommend:{0}, currnet:{1}'.format(recommend, (appliance, method)))
+        if recommend == (appliance, method): correct += 1 
+        count += 1
+        speed.execute((appliance, method))
+        recommend = speed.recommend()        
+        print('correct:{0}, count:{1}'.format(correct, count))
+        print('accuracy:{0}%'.format((correct / count) * 100))
+        print('--------')
+        
+        if count > 700:
+            break
+        
+
+    
+    '''
+    input = ['A', 'B', 'b', 'D', 'C', 'c', 'a', 'B', 'C', 'b', 'd', 'c', 'A', 'D', 'a', 'B', 'A', 'd', 'a', 'b']
     # A -> viera on
     # B -> light
     # C -> fan
     # D -> tv
-    '''
+
     input = [('viera', 1),
              ('light', 1),
              ('light', 0),
@@ -261,16 +276,17 @@ if __name__ == "__main__":
              ('tv',0),
              ('viera',0),
              ('light',0)]
-    
+
     for i in input:
         print(speed.execute(i))
-
-    speed.tree.print_node()
-    #speed.tree.print_tree(speed.tree.root)
-    #print(speed.calc_probability(('light', 0), speed.tree.trace(speed.tree.root, [('viera', 1), ('tv', 0), ('viera', 0)])))
-    #print(speed.recommend())
     '''
+    #print(speed.calc_probability(('light', 0), speed.tree.trace(speed.tree.root, [('viera', 1), ('tv', 0), ('viera', 0)])))
+    #print(speed.calc_probability('A', speed.tree.trace(speed.tree.root, 'Adabdadd')))
+    #print(speed.recommend())
+
     
-    speed.pre_learning()
-    print(speed.prediction())
+    #speed.pre_learning()
+    #print(speed.prediction())
+
+    
 
