@@ -50,7 +50,7 @@ except ImportError:
 
 dist = setup(  
         name='room',                        # パッケージ名
-        version='0.1.6',                    # バージョン
+        version='0.1.8',                    # バージョン
         author='takatorino',                # 作者の名前
         author_email='tktr3w5e0@gmail.com', # 連絡先
         url='https://github.com/takatori',  # GitHubのリポジトリとか
