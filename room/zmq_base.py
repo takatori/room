@@ -6,8 +6,6 @@ import multiprocessing
 from zmq.eventloop import ioloop, zmqstream
 from zmq.utils import jsonapi as json
 
-from room.utils.log import logging
-
 class ZmqProcess(multiprocessing.Process):
     """
     This is the base for all processes and offers utility functions 
@@ -104,7 +102,7 @@ class  MessageHandler(object):
         registered at. *msg* is a list as return by
         :meth:`zmq.core.socket.Socket.recv_multipart`.
         """
-        logging.info(msg)
+
         method = msg[1].decode('utf-8')
         data = json.loads(msg[2])
         # Get the actual message handler and call it

@@ -3,7 +3,6 @@
 
 import re
 from collections import defaultdict
-from room.modules.miner.estimator.speed_data import Data
 
 class SPEED(object):
     '''
@@ -17,13 +16,14 @@ class SPEED(object):
         self.max_episode_length = 1
         self.tree = ContextTree()
         #self.pre_learning()
-
+    '''
     def pre_learning(self):
         data = Data()
         past_events = data.load()
 
         for event in past_events:
             self.execute(event)
+    '''
 
                     
     def execute(self, event):

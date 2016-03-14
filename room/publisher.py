@@ -39,7 +39,6 @@ class Publisher(object):
         '''
         assert isinstance(title, str), '[type error]: {0} != str'.format(title)
         assert isinstance(method, str), '[type error]: {0} != str'.format(method)
-        assert isinstance(data, str) or isinstance(data, dict) or isinstance(data, list), '[type error]: {0} != str || dict || list'.format(data)
 
         if title:
             self.title = title  # send時にtitleが設定されていればその値を使用する
